@@ -8,6 +8,9 @@ from kivy.uix.widget import Widget
 from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
 
 
+class MyBox(Widget):
+    pass
+
 class FirstPage(Button):
     def __init__(self):
         super().__init__()
