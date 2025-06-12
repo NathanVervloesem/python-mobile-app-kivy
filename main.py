@@ -5,7 +5,28 @@ from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.graphics import Rectangle, Line
 from kivy.uix.widget import Widget
+from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
 
+
+class FirstPage(Button):
+    def __init__(self):
+        super().__init__()
+        self.text = 'hi'
+        self.bind(on_press=self.switch)
+
+    def switch(self,item):
+        myapp.screen_manager.transition = SlideTransition(direction='left')
+        myapp.screen_manager.current = 'Second'
+
+class SecondPage(Button):
+    def __init__(self):
+        super().__init__()
+        self.text = 'hi there'
+        self.bind(on_press=self.switch)
+
+    def switch(self,item):
+        myapp.screen_manager.transition = SlideTransition(direction='right')
+        myapp.screen_manager.current = 'First'
 
 class MyWidget(Widget):
     def on_touch_down(self, touch):
@@ -49,8 +70,22 @@ class MyLayout(BoxLayout):
 
 class MyApp(App):
     def build(self):
+        self.screen_manager = ScreenManager()
+
+        # First page
+        self.firstpage = FirstPage()
+        screen = Screen(name='First')
+        screen.add_widget(self.firstpage)
+        self.screen_manager.add_widget(screen)
+
+        # Second page
+        self.secondpage = SecondPage()
+        screen = Screen(name='Second')
+        screen.add_widget(self.secondpage)
+        self.screen_manager.add_widget(screen)
         
-        return MyWidget()
-    
-if __name__ == '__main__':
-    MyApp().run()
+        return self.screen_manager
+
+
+myapp = MyApp()
+myapp.run()
