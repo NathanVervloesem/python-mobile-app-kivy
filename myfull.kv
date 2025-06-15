@@ -1,42 +1,121 @@
 <RootWidget>:
-    inputbutton: inputbutton
-    inputcontent: inputcontent
-    outputcontent: outputcontent
+    inputbutton1: inputbutton1
+    inputcontent1: inputcontent1
+    inputbutton2: inputbutton2
+    inputcontent2: inputcontent2    
+    inputbutton3: inputbutton3
+    inputcontent3: inputcontent3    
+    outputcontent1: outputcontent1
+    outputcontent2: outputcontent2
+    outputcontent3: outputcontent3
 
     orientation: 'vertical'
 
     BoxLayout:
-        size_hint: 1, 0.3
+        size_hint: 1, 1
         orientation: 'vertical'
         
 
         Label:
             text: 'Shopping List'
-            size_hint: 1, 0.3
+            size_hint: 1, 0.1
 
-        BoxLayout:
-            orientation: 'horizontal'
+        Tabs:
+            do_default_tab: False
+            size_hint: 1, 1
+            
+            TabbedPanelItem:
+                text: 'Lidl'
+                BoxLayout:
+                    orientation:'vertical'
+                    BoxLayout:
+                        size_hint: 1, 0.2
+                        Button:
+                            id: inputbutton1
+                            size_hint: 0.25, 1
+                            text: 'add'
+                            on_press: root.add_item1()
 
-            Button:
-                id: inputbutton
-                size_hint: 0.25, 1
-                text: 'add'
-                on_press: root.add_item()
+                        TextInput:
+                            id: inputcontent1
+                            multiline: False
+                
+                    ListWidget:
+                        id: outputcontent1
+                        viewclass: 'Button'
+                        orientation: 'vertical'
 
-            TextInput:
-                id: inputcontent
-                multiline: False
+                        RecycleBoxLayout:
+                            default_size: None, dp(56)
+                            default_size_hint: 1, None
+                            size_hint_y: None
+                            height: self.minimum_height
+                            orientation: 'vertical'
+
+            TabbedPanelItem:
+                text: 'Aldi'
+                BoxLayout:
+                    orientation:'vertical'
+                    BoxLayout:
+                        size_hint: 1, 0.2
+                        Button:
+                            id: inputbutton2
+                            size_hint: 0.25, 1
+                            text: 'add'
+                            on_press: root.add_item2()
+
+                        TextInput:
+                            id: inputcontent2
+                            multiline: False
+
+                    ListWidget:
+                        id: outputcontent2
+                        viewclass: 'Button'
+                        orientation: 'vertical'
+
+                        RecycleBoxLayout:
+                            default_size: None, dp(56)
+                            default_size_hint: 1, None
+                            size_hint_y: None
+                            height: self.minimum_height
+                            orientation: 'vertical'
+
+            TabbedPanelItem:
+                text: 'Carrefour'
+
+                BoxLayout:
+                    orientation:'vertical'
+                    BoxLayout:
+                        size_hint: 1, 0.2
+                        Button:
+                            id: inputbutton3
+                            size_hint: 0.25, 1
+                            text: 'add'
+                            on_press: root.add_item3()
+
+                        TextInput:
+                            id: inputcontent3
+                            multiline: False
+
+                    ListWidget:
+                        id: outputcontent3
+                        viewclass: 'Button'
+                        orientation: 'vertical'
+
+                        RecycleBoxLayout:
+                            default_size: None, dp(56)
+                            default_size_hint: 1, None
+                            size_hint_y: None
+                            height: self.minimum_height
+                            orientation: 'vertical'
+
+            
 
 
-    ListWidget:
-        id: outputcontent
-        viewclass: 'Label'
-        orientation: 'vertical'
 
-        RecycleBoxLayout:
-            default_size: None, dp(56)
-            default_size_hint: 0.4, None
-            size_hint_y: None
-            height: self.minimum_height
-            orientation: 'vertical'
+    
+
+        
+
+ 
 
