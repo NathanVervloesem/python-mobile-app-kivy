@@ -32,12 +32,6 @@
             text: 'Shopping List'
             size_hint: 1, 0.1
 
-        Button:
-            text: 'load data'
-            size_hint: 1, 0.1
-            on_press: root.load_items()
-
-
         Tabs:
             do_default_tab: False
             size_hint: 1, 1
@@ -75,7 +69,7 @@
                 BoxLayout:
                     orientation:'vertical'
                     BoxLayout:
-                        size_hint: 1, 0.2
+                        size_hint: 1, 0.1
                         Button:
                             id: inputbutton2
                             size_hint: 0.25, 1
@@ -104,7 +98,7 @@
                 BoxLayout:
                     orientation:'vertical'
                     BoxLayout:
-                        size_hint: 1, 0.2
+                        size_hint: 1, 0.1
                         Button:
                             id: inputbutton3
                             size_hint: 0.25, 1
@@ -126,6 +120,13 @@
                             size_hint_y: None
                             height: self.minimum_height
                             orientation: 'vertical'
+
+
+        Button:
+            size_hint: 1, 0.1
+            text: 'clear tab'
+            on_press: root.clear_tab()
+
 
             
 

@@ -27,6 +27,24 @@ class SelectableBox(RecycleDataViewBehavior, BoxLayout):
         itemlist.update()
 
         print(f"Button clicked of item: {self.text}")
+
+        # Communicate with backend to remove the item
+        self.remove_item_in_backend(myapp.curr_tab)
+
+
+    def remove_item_in_backend(self, curr_tab):
+        print(self.text) # need to get the unformatted itemname
+        item_formatted = self.text
+        item_name = item_formatted[2:]
+        try:
+            response = requests.post("http://127.0.0.1:8080/items/remove", json={"name": item_name, "store": curr_tab})
+            print("Server response:", response.json())
+        except Exception as e:
+            print("Error sending data:", e)
+        
+
+
+
 class Tabs(TabbedPanel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -55,73 +73,82 @@ class RootWidget(BoxLayout):
     outputcontent2 = ObjectProperty(None)
     outputcontent3 = ObjectProperty(None)
 
-    # def get_backend_data(self):
-    #     response = requests.get("http://127.0.0.1:8080/")
-    #     data = response.json()
-    #     print(data) 
-        
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.load_items()
 
-    # Get the data from the backend - fastapi
-    # # Backend call
-
-    # print(outputcontent1)
-    # outputcontent1.items.append(data["1"])
-    # outputcontent2.items = data["2"]
-    # outputcontent3.items = data["3"]
     def load_items(self):
-        response = requests.get("http://127.0.0.1:8080/")
-        data = response.json()
-        print(data) 
+        response = requests.get("http://127.0.0.1:8080/items/")
+        print(f"Status Code: {response.status_code}")
+        print(f"Raw Response: {response.text}")  # See actual cont
+        
+        if response.status_code == 200:
+            try:
+                data = response.json()
+                print(data) 
 
-        self.outputcontent1.items = data["1"]
-        self.outputcontent2.items = data["2"]
-        self.outputcontent3.items = data["3"]
+                # Get the data in the correct format
+                for item in data:
+                    formatted = f'\n {item['name']}'
+                    store = item['store']
+                    if store == 'Lidl':
+                        self.outputcontent1.items.append(formatted)
+                    elif store == 'Aldi':
+                        self.outputcontent2.items.append(formatted)
+                    elif store == 'Carrefour':
+                        self.outputcontent3.items.append(formatted)   
+                       
+                # update
+                self.outputcontent1.update()
+                self.outputcontent2.update()
+                self.outputcontent3.update()
+                   
+            except Exception as e:
+                print(f"JSON decode error: {e}")
+        else:
+            print("Error Unexpected status code")
 
-        # update
-        self.outputcontent1.update()
-        self.outputcontent2.update()
-        self.outputcontent3.update()
 
-    def send_to_backend(self):
-        url = "http://127.0.0.1:8080/send"
-        data = {
-            "one": self.outputcontent1.items,
-            "two": self.outputcontent2.items,
-            "three": self.outputcontent3.items
-        }
+    def send_to_backend(self, ct, itemname):
+        url = "http://127.0.0.1:8080/items/add"
+        data = { 
+            'name': str(itemname),
+            'store': ct
+            }
         try:
             response = requests.post(url, json=data)
             print("Server response:", response.json())
         except Exception as e:
             print("Error sending data:", e)
-      
-
 
     def add_item(self):
         #print(self.give_current_tab_name())
         # always prints Default Tab
-        
-        if myapp.curr_tab == 'Lidl':
+        ct = myapp.curr_tab
+        if ct == 'Lidl':
             itemlist = self.outputcontent1
             input = self.inputcontent1
-        elif myapp.curr_tab == 'Aldi':
+        elif ct == 'Aldi':
             itemlist = self.outputcontent2
             input = self.inputcontent2
-        elif myapp.curr_tab == 'Carrefour':
+        elif ct == 'Carrefour':
             itemlist = self.outputcontent3 
             input = self.inputcontent3
-        print('Current tab: ',myapp.curr_tab)
+        print('Current tab: ',ct)
 
         if input.text != "":
+            # Save item
+            item = input.text
             # Get correct tab
             print( itemlist.items)
-            formatted = f'\n {input.text}'
+            formatted = f'\n {item}'
             itemlist.items.append(formatted)
             itemlist.update()
             input.text = ""
 
             # and send it to the backend
-            self.send_to_backend()
+            self.send_to_backend(ct,item)
+    
             
       
 
