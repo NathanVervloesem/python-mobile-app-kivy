@@ -1,3 +1,14 @@
+<SelectableBox>:
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: 20
+    Label:
+        text: root.text
+    Button:
+        size_hint: 0.25, 1
+        text: "x"
+        on_press: root.on_button_click()
+
 <RootWidget>:
     inputbutton1: inputbutton1
     inputcontent1: inputcontent1
@@ -14,11 +25,18 @@
     BoxLayout:
         size_hint: 1, 1
         orientation: 'vertical'
+
         
 
         Label:
             text: 'Shopping List'
             size_hint: 1, 0.1
+
+        Button:
+            text: 'load data'
+            size_hint: 1, 0.1
+            on_press: root.load_items()
+
 
         Tabs:
             do_default_tab: False
@@ -29,12 +47,12 @@
                 BoxLayout:
                     orientation:'vertical'
                     BoxLayout:
-                        size_hint: 1, 0.2
+                        size_hint: 1, 0.1
                         Button:
                             id: inputbutton1
                             size_hint: 0.25, 1
                             text: 'add'
-                            on_press: root.add_item1()
+                            on_press: root.add_item()
 
                         TextInput:
                             id: inputcontent1
@@ -42,7 +60,7 @@
                 
                     ListWidget:
                         id: outputcontent1
-                        viewclass: 'Button'
+                        viewclass: 'SelectableBox'
                         orientation: 'vertical'
 
                         RecycleBoxLayout:
@@ -62,7 +80,7 @@
                             id: inputbutton2
                             size_hint: 0.25, 1
                             text: 'add'
-                            on_press: root.add_item2()
+                            on_press: root.add_item()
 
                         TextInput:
                             id: inputcontent2
@@ -70,7 +88,7 @@
 
                     ListWidget:
                         id: outputcontent2
-                        viewclass: 'Button'
+                        viewclass: 'SelectableBox'
                         orientation: 'vertical'
 
                         RecycleBoxLayout:
@@ -91,7 +109,7 @@
                             id: inputbutton3
                             size_hint: 0.25, 1
                             text: 'add'
-                            on_press: root.add_item3()
+                            on_press: root.add_item()
 
                         TextInput:
                             id: inputcontent3
@@ -99,7 +117,7 @@
 
                     ListWidget:
                         id: outputcontent3
-                        viewclass: 'Button'
+                        viewclass: 'SelectableBox'
                         orientation: 'vertical'
 
                         RecycleBoxLayout:
@@ -110,6 +128,7 @@
                             orientation: 'vertical'
 
             
+
 
 
 
