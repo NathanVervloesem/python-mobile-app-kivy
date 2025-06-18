@@ -155,22 +155,13 @@
                             orientation: 'vertical'
                             
 
-        BoxLayout:
+   
+        Button:
             size_hint: 1, 0.1
-            orientation: 'horizontal'
-            Button:
-                size_hint: 0.5, 1
-                text: 'save locally'
-                font_size: 25
-                background_color: (0, 0, 1, 1)
-                on_press: root.save_local()
-
-            Button:
-                size_hint: 0.5, 1
-                text: 'clear tab'
-                background_color: (1, 0, 0, 1)
-                on_press: root.clear_tab()
-                font_size: 25
+            text: 'clear tab'
+            background_color: (1, 0, 0, 1)
+            on_press: root.clear_tab()
+            font_size: 25
 
 
 
