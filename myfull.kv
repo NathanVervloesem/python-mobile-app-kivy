@@ -4,10 +4,13 @@
     height: 20
     Label:
         text: root.text
+        font_size: 23
     Button:
-        size_hint: 0.25, 1
+        size_hint: 0.20, 1
         text: "x"
+        background_color: (1, 0, 0, 1)
         on_press: root.on_button_click()
+        font_size: 32
 
 <RootWidget>:
     inputbutton1: inputbutton1
@@ -26,18 +29,25 @@
         size_hint: 1, 1
         orientation: 'vertical'
 
-        
 
         Label:
             text: 'Shopping List'
             size_hint: 1, 0.1
+            font_size: 32
 
         Tabs:
             do_default_tab: False
-            size_hint: 1, 1
             
             TabbedPanelItem:
                 text: 'Lidl'
+                font_size: 25
+                canvas.after:
+                    Color:
+                        rgba: (0.2, 0.6, 1, 0.2) if self.state == 'down' else (0.7, 0.7, 0.7, 0.2)
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                        
                 BoxLayout:
                     orientation:'vertical'
                     BoxLayout:
@@ -46,11 +56,14 @@
                             id: inputbutton1
                             size_hint: 0.25, 1
                             text: 'add'
+                            background_color: (0, 1, 0, 1)
                             on_press: root.add_item()
+                            font_size: 23
 
                         TextInput:
                             id: inputcontent1
                             multiline: False
+                            font_size: 23
                 
                     ListWidget:
                         id: outputcontent1
@@ -66,6 +79,13 @@
 
             TabbedPanelItem:
                 text: 'Aldi'
+                font_size: 25
+                canvas.after:
+                    Color:
+                        rgba: (0.2, 0.6, 1, 0.2) if self.state == 'down' else (0.7, 0.7, 0.7, 0.2)
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
                 BoxLayout:
                     orientation:'vertical'
                     BoxLayout:
@@ -74,11 +94,14 @@
                             id: inputbutton2
                             size_hint: 0.25, 1
                             text: 'add'
+                            background_color: (0, 1, 0, 1)
                             on_press: root.add_item()
+                            font_size: 23
 
                         TextInput:
                             id: inputcontent2
                             multiline: False
+                            font_size: 23
 
                     ListWidget:
                         id: outputcontent2
@@ -94,6 +117,13 @@
 
             TabbedPanelItem:
                 text: 'Carrefour'
+                font_size: 25
+                canvas.after:
+                    Color:
+                        rgba: (0.2, 0.6, 1, 0.2) if self.state == 'down' else (0.7, 0.7, 0.7, 0.2)
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
 
                 BoxLayout:
                     orientation:'vertical'
@@ -103,11 +133,14 @@
                             id: inputbutton3
                             size_hint: 0.25, 1
                             text: 'add'
+                            background_color: (0, 1, 0, 1)
                             on_press: root.add_item()
+                            font_size: 23
 
                         TextInput:
                             id: inputcontent3
                             multiline: False
+                            font_size: 23
 
                     ListWidget:
                         id: outputcontent3
@@ -120,12 +153,26 @@
                             size_hint_y: None
                             height: self.minimum_height
                             orientation: 'vertical'
+                            
 
-
-        Button:
+        BoxLayout:
             size_hint: 1, 0.1
-            text: 'clear tab'
-            on_press: root.clear_tab()
+            orientation: 'horizontal'
+            Button:
+                size_hint: 0.5, 1
+                text: 'save locally'
+                font_size: 25
+                background_color: (0, 0, 1, 1)
+                on_press: root.save_local()
+
+            Button:
+                size_hint: 0.5, 1
+                text: 'clear tab'
+                background_color: (1, 0, 0, 1)
+                on_press: root.clear_tab()
+                font_size: 25
+
+
 
 
             

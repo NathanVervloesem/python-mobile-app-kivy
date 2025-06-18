@@ -6,9 +6,13 @@ from kivy.uix.tabbedpanel import TabbedPanel
 from kivy.clock import Clock
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.properties import StringProperty
-import pprint
+import os
+import json
 import requests
 
+DATA_FILE = 'items.json'
+with open('items.json', 'w') as f:
+    json.dump([], f)
 
 class SelectableBox(RecycleDataViewBehavior, BoxLayout):
     text = StringProperty("")
@@ -16,12 +20,7 @@ class SelectableBox(RecycleDataViewBehavior, BoxLayout):
     def on_button_click(self):
         print('Current tab remove: ',myapp.curr_tab)
 
-        if myapp.curr_tab == 'Lidl':
-            itemlist = myapp.rw.outputcontent1
-        elif myapp.curr_tab == 'Aldi':
-            itemlist = myapp.rw.outputcontent2
-        elif myapp.curr_tab == 'Carrefour':
-            itemlist = myapp.rw.outputcontent3      
+        itemlist = myapp.rw.get_itemlist()      
         
         itemlist.items.remove(self.text)
         itemlist.update()
@@ -33,17 +32,14 @@ class SelectableBox(RecycleDataViewBehavior, BoxLayout):
 
 
     def remove_item_in_backend(self, curr_tab):
-        print(self.text) # need to get the unformatted itemname
         item_formatted = self.text
-        item_name = item_formatted[2:]
+        item_name = item_formatted#[2:]
         try:
-            response = requests.post("http://127.0.0.1:8080/items/remove", json={"name": item_name, "store": curr_tab})
+            url = myapp.url + "items/remove"
+            response = requests.post(url, json={"name": item_name, "store": curr_tab})
             print("Server response:", response.json())
         except Exception as e:
             print("Error sending data:", e)
-        
-
-
 
 class Tabs(TabbedPanel):
     def __init__(self, **kwargs):
@@ -78,7 +74,8 @@ class RootWidget(BoxLayout):
         self.load_items()
 
     def load_items(self):
-        response = requests.get("http://127.0.0.1:8080/items/")
+        url = myapp.url + "items/"
+        response = requests.get(url)
         print(f"Status Code: {response.status_code}")
         print(f"Raw Response: {response.text}")  # See actual cont
         
@@ -89,7 +86,7 @@ class RootWidget(BoxLayout):
 
                 # Get the data in the correct format
                 for item in data:
-                    formatted = f'\n {item['name']}'
+                    formatted = f'{item['name']}'
                     store = item['store']
                     if store == 'Lidl':
                         self.outputcontent1.items.append(formatted)
@@ -110,7 +107,7 @@ class RootWidget(BoxLayout):
 
 
     def send_to_backend(self, ct, itemname):
-        url = "http://127.0.0.1:8080/items/add"
+        url = myapp.url + "items/add"
         data = { 
             'name': str(itemname),
             'store': ct
@@ -141,7 +138,7 @@ class RootWidget(BoxLayout):
             item = input.text
             # Get correct tab
             print( itemlist.items)
-            formatted = f'\n {item}'
+            formatted = f'{item}'
             itemlist.items.append(formatted)
             itemlist.update()
             input.text = ""
@@ -149,13 +146,70 @@ class RootWidget(BoxLayout):
             # and send it to the backend
             self.send_to_backend(ct,item)
     
+    def clear_tab(self):
+
+        itemlist = self.get_itemlist() 
+
+        itemlist.items = [] 
+        itemlist.update()   
+
+        # Send this to backend
+        self.clear_tab_backend(myapp.curr_tab)   
+    
+    def clear_tab_backend(self, ct):
+        try:
+            url = myapp.url + "items/clear_tab"
+            response = requests.post(url, json={"name": "item", "store": ct})
+            print("Server response:", response.json())
+        except Exception as e:
+            print("Error sending data:", e)   
+
+    def save_local(self):
             
-      
+        # Save all items to JSON file
+        with open(DATA_FILE, "r") as f:
+            #items = [json.load(f)]
+            items = []
+            for i in self.outputcontent1.items:
+                item = { 
+                    'name': str(i),
+                    'store': 'Lidl'
+                }                 
+                items.append(item)
+            for i in self.outputcontent2.items:
+                item = { 
+                    'name': str(i),
+                    'store': 'Aldi'
+                }                 
+                items.append(item) 
+            for i in self.outputcontent3.items:
+                item = { 
+                    'name': str(i),
+                    'store': 'Carrefour'
+                }                 
+                items.append(item)
+        with open(DATA_FILE, "w") as f:
+            json.dump(items, f, indent=2)
+            print('Saved to local file')
+
+
+
+    def get_itemlist(self):
+        ct = myapp.curr_tab
+        if ct == 'Lidl':
+            itemlist = myapp.rw.outputcontent1
+        elif ct == 'Aldi':
+            itemlist = myapp.rw.outputcontent2
+        elif ct == 'Carrefour':
+            itemlist = myapp.rw.outputcontent3    
+
+        return itemlist
 
 class MyfullApp(App):
     def __init__(self):
         super().__init__()
         self.curr_tab = 'Lidl'
+        self.url = 'https://fastapi-shopping-1.onrender.com/'
 
     def build(self):
         rw = RootWidget()
