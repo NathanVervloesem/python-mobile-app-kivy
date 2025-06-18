@@ -15,13 +15,16 @@
 <RootWidget>:
     inputbutton1: inputbutton1
     inputcontent1: inputcontent1
+    outputcontent1: outputcontent1    
     inputbutton2: inputbutton2
     inputcontent2: inputcontent2    
+    outputcontent2: outputcontent2
     inputbutton3: inputbutton3
     inputcontent3: inputcontent3    
-    outputcontent1: outputcontent1
-    outputcontent2: outputcontent2
     outputcontent3: outputcontent3
+    inputbutton4: inputbutton4
+    inputcontent4: inputcontent4    
+    outputcontent4: outputcontent4
 
     orientation: 'vertical'
 
@@ -64,6 +67,13 @@
                             id: inputcontent1
                             multiline: False
                             font_size: 23
+
+                        Button:
+                            size_hint: 0.4, 1
+                            text: 'clear tab'
+                            background_color: (1, 0, 0, 1)
+                            on_press: root.clear_tab()
+                            font_size: 25
                 
                     ListWidget:
                         id: outputcontent1
@@ -102,6 +112,13 @@
                             id: inputcontent2
                             multiline: False
                             font_size: 23
+
+                        Button:
+                            size_hint: 0.4, 1
+                            text: 'clear tab'
+                            background_color: (1, 0, 0, 1)
+                            on_press: root.clear_tab()
+                            font_size: 25
 
                     ListWidget:
                         id: outputcontent2
@@ -142,6 +159,13 @@
                             multiline: False
                             font_size: 23
 
+                        Button:
+                            size_hint: 0.4, 1
+                            text: 'clear tab'
+                            background_color: (1, 0, 0, 1)
+                            on_press: root.clear_tab()
+                            font_size: 25
+
                     ListWidget:
                         id: outputcontent3
                         viewclass: 'SelectableBox'
@@ -154,14 +178,53 @@
                             height: self.minimum_height
                             orientation: 'vertical'
                             
+            TabbedPanelItem:
+                text: 'Allerlei'
+                font_size: 25
+                canvas.after:
+                    Color:
+                        rgba: (0.2, 0.6, 1, 0.2) if self.state == 'down' else (0.7, 0.7, 0.7, 0.2)
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+
+                BoxLayout:
+                    orientation:'vertical'
+                    BoxLayout:
+                        size_hint: 1, 0.1
+                        Button:
+                            id: inputbutton4
+                            size_hint: 0.25, 1
+                            text: 'add'
+                            background_color: (0, 1, 0, 1)
+                            on_press: root.add_item()
+                            font_size: 23
+
+                        TextInput:
+                            id: inputcontent4
+                            multiline: False
+                            font_size: 23
+
+                        Button:
+                            size_hint: 0.4, 1
+                            text: 'clear tab'
+                            background_color: (1, 0, 0, 1)
+                            on_press: root.clear_tab()
+                            font_size: 25
+
+                    ListWidget:
+                        id: outputcontent4
+                        viewclass: 'SelectableBox'
+                        orientation: 'vertical'
+
+                        RecycleBoxLayout:
+                            default_size: None, dp(56)
+                            default_size_hint: 1, None
+                            size_hint_y: None
+                            height: self.minimum_height
+                            orientation: 'vertical'
 
    
-        Button:
-            size_hint: 1, 0.1
-            text: 'clear tab'
-            background_color: (1, 0, 0, 1)
-            on_press: root.clear_tab()
-            font_size: 25
 
 
 

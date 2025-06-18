@@ -72,11 +72,19 @@ class ListWidget(RecycleView):
 class RootWidget(BoxLayout):
     inputbutton1 = ObjectProperty(None)
     inputcontent1 = ObjectProperty(None)
-    inputbutton2 = ObjectProperty(None)
-    inputcontent2 = ObjectProperty(None)    
     outputcontent1 = ObjectProperty(None)
-    outputcontent2 = ObjectProperty(None)
+
+    inputbutton2 = ObjectProperty(None)
+    inputcontent2 = ObjectProperty(None) 
+    outputcontent2 = ObjectProperty(None)  
+
+    inputbutton3 = ObjectProperty(None)
+    inputcontent3 = ObjectProperty(None)    
     outputcontent3 = ObjectProperty(None)
+
+    inputbutton4 = ObjectProperty(None)
+    inputcontent4 = ObjectProperty(None)    
+    outputcontent4 = ObjectProperty(None)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -111,6 +119,7 @@ class RootWidget(BoxLayout):
                 self.outputcontent1.update()
                 self.outputcontent2.update()
                 self.outputcontent3.update()
+                self.outputcontent4.update()
 
 
                 # Save locally 
@@ -144,6 +153,8 @@ class RootWidget(BoxLayout):
                 self.outputcontent2.items.append(formatted)
             elif store == 'Carrefour':
                 self.outputcontent3.items.append(formatted)         
+            elif store == 'Allerlei':
+                self.outputcontent4.items.append(formatted) 
 
     def send_to_backend(self, ct, itemname):
         url = myapp.url + "items/add"
@@ -174,6 +185,9 @@ class RootWidget(BoxLayout):
         elif ct == 'Carrefour':
             itemlist = self.outputcontent3 
             input = self.inputcontent3
+        elif ct == 'Allerlei':
+            itemlist = self.outputcontent4
+            input = self.inputcontent4
         print('Current tab: ',ct)
 
         if input.text != "":
@@ -253,7 +267,10 @@ class RootWidget(BoxLayout):
         elif ct == 'Aldi':
             itemlist = myapp.rw.outputcontent2
         elif ct == 'Carrefour':
-            itemlist = myapp.rw.outputcontent3    
+            itemlist = myapp.rw.outputcontent3 
+        elif ct == 'Allerlei':
+            itemlist = myapp.rw.outputcontent4 
+
 
         return itemlist
 
