@@ -12,11 +12,12 @@ import os
 import json
 import requests
 
-# DATA_FILE = 'items.json'
-# Ensure the file exists
-# if not os.path.exists(DATA_FILE):
-#     with open(DATA_FILE, "w") as f:
-#         json.dump([], f)
+DATA_FILE = 'items.json'
+#Ensure the file exists
+if not os.path.exists(DATA_FILE):
+    with open(DATA_FILE, "w") as f:
+        json.dump([], f)
+
 # with open('items.json', 'w') as f:
 #     json.dump([], f)
 
@@ -66,9 +67,9 @@ class SelectableBox(RecycleDataViewBehavior, BoxLayout):
         except Exception as e:
             print("Error sending data:", e)
         finally:
-            pass
+            
             # Save changes locally
-            # myapp.rw.save_local()
+            myapp.rw.save_local()
 
 class Tabs(TabbedPanel):
     def __init__(self, **kwargs):
@@ -108,8 +109,10 @@ class RootWidget(BoxLayout):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        
 
+    def on_kv_post(self, base_widget):
+        myapp.rw = self
+        self.load_items()
 
     def load_items(self):
         # GET from backend
@@ -127,7 +130,7 @@ class RootWidget(BoxLayout):
                 print(f"JSON decode error: {e}")
 
                 # If decoding error, load locally
-                # data = self.load_local()
+                data = self.load_local()
 
 
             finally:
@@ -143,22 +146,28 @@ class RootWidget(BoxLayout):
 
 
                 # Save locally 
-                # self.save_local()
+                self.save_local()
                         
             
         except Exception as e:
             print(f"Error Unexpected status code: {e}")
 
             # If connection error, load locally
-            #data = self.load_local()
+            data = self.load_local()
 
             # Gives error that self.outputcontent1.items does not exist
-            # self.convert_data(data)
+            self.convert_data(data)
 
             # print(data)
  
             # Get the data in the correct format
             #self.convert_data(data)
+
+            # update
+            self.outputcontent1.update()
+            self.outputcontent2.update()
+            self.outputcontent3.update()
+            self.outputcontent4.update()
    
         
 
@@ -187,9 +196,9 @@ class RootWidget(BoxLayout):
         except Exception as e:
             print("Error sending data:", e)
         finally:
-            pass
+            # pass
             # Save locally
-            # self.save_local()
+            self.save_local()
 
     def add_item(self):
         #print(self.give_current_tab_name())
@@ -240,44 +249,51 @@ class RootWidget(BoxLayout):
         except Exception as e:
             print("Error sending data:", e)   
         finally:
-            pass
+            # pass
             # Save locally
-            # self.save_local()
+            self.save_local()
 
 
-    # def save_local(self):
+    def save_local(self):
             
-    #     # Save all items to JSON file, inefficient but fine for now
-    #     with open(DATA_FILE, "r") as f:
-    #         #items = [json.load(f)]
-    #         items = []
-    #         for i in self.outputcontent1.items:
-    #             item = { 
-    #                 'name': str(i),
-    #                 'store': 'Lidl'
-    #             }                 
-    #             items.append(item)
-    #         for i in self.outputcontent2.items:
-    #             item = { 
-    #                 'name': str(i),
-    #                 'store': 'Aldi'
-    #             }                 
-    #             items.append(item) 
-    #         for i in self.outputcontent3.items:
-    #             item = { 
-    #                 'name': str(i),
-    #                 'store': 'Carrefour'
-    #             }                 
-    #             items.append(item)
-    #     with open(DATA_FILE, "w") as f:
-    #         json.dump(items, f, indent=2)
-    #         print('Saved to local file')
+        # Save all items to JSON file, inefficient but fine for now
+        with open(DATA_FILE, "r") as f:
+            #items = [json.load(f)]
+            items = []
+            for i in self.outputcontent1.items:
+                item = { 
+                    'name': str(i),
+                    'store': 'Lidl'
+                }                 
+                items.append(item)
+            for i in self.outputcontent2.items:
+                item = { 
+                    'name': str(i),
+                    'store': 'Aldi'
+                }                 
+                items.append(item) 
+            for i in self.outputcontent3.items:
+                item = { 
+                    'name': str(i),
+                    'store': 'Carrefour'
+                }                 
+                items.append(item)
+            for i in self.outputcontent4.items:
+                item = { 
+                    'name': str(i),
+                    'store': 'Allerlei'
+                }                 
+                items.append(item)
+        with open(DATA_FILE, "w") as f:
+            json.dump(items, f, indent=2)
+            print('Saved to local file')
     
-    # def load_local(self):
-    #     with open(DATA_FILE, "r") as f:
-    #         data = json.load(f)
+    def load_local(self):
+        with open(DATA_FILE, "r") as f:
+            data = json.load(f)
+            print('Loading local data')
         
-    #     return data
+        return data
 
     def get_itemlist(self):
         ct = myapp.curr_tab
@@ -303,17 +319,15 @@ class MyshoppingApp(App):
     def build(self):
         # Initialize Rootwidget
         rw = RootWidget()
-        self.rw = rw
-        rw.load_items()
 
         # Initialize tabs
         tp = Tabs()
         tp.bind(current_tab=tp.on_current_tab)
         self.tp = tp
         self.curr_tab = tp.current_tab
-        self.curr_tab = 'Lidl'
+       
         return rw
     
 myapp = MyshoppingApp()
-myapp.build()
+#myapp.build()
 myapp.run()
