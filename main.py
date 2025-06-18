@@ -18,8 +18,10 @@ if not os.path.exists(DATA_FILE_ITEMS):
     with open(DATA_FILE_ITEMS, "w") as f:
         json.dump([], f)
 
-# with open('items.json', 'w') as f:
-#     json.dump([], f)
+DATA_FILE_CHANGES = 'changes.json'
+if not os.path.exists(DATA_FILE_CHANGES):
+    with open(DATA_FILE_CHANGES, "w") as f:
+        json.dump([], f)
 
 # class FirstPage(BoxLayout):
 #     def __init__(self):
@@ -53,15 +55,14 @@ class SelectableBox(RecycleDataViewBehavior, BoxLayout):
         print(f"Button clicked of item: {self.text}")
 
         # Communicate with backend to remove the item
-        self.remove_item_in_backend(myapp.curr_tab)
+        self.remove_item_in_backend(myapp.curr_tab,self.text)
 
 
-    def remove_item_in_backend(self, curr_tab):
+    def remove_item_in_backend(self, curr_tab, item_name):
         # Try to communicate with backend
         status = myapp.rw.ids.connection_status.text
         if status == 'Connected':
-            item_formatted = self.text
-            item_name = item_formatted#[2:]
+            
             try:
                 url = myapp.url + "items/remove"
                 response = requests.post(url, json={"name": item_name, "store": curr_tab})
@@ -74,7 +75,8 @@ class SelectableBox(RecycleDataViewBehavior, BoxLayout):
                 myapp.rw.save_local_all()
 
         elif status == "No Connection":
-            pass #TODO 
+            myapp.rw.add_change_local(item_name,curr_tab,'remove')
+
 
 
 class Tabs(TabbedPanel):
@@ -125,6 +127,7 @@ class RootWidget(BoxLayout):
             if response.status_code == 200:
                 self.ids.connection_status.text = "Connected"
                 self.ids.connection_status.color = (0, 1, 0, 1)  # green
+
             else:
                 self.ids.connection_status.text = "Unreachable"
                 self.ids.connection_status.color = (1, 0.5, 0, 1)  # orange
@@ -132,7 +135,22 @@ class RootWidget(BoxLayout):
             self.ids.connection_status.text = "No Connection"
             self.ids.connection_status.color = (1, 0, 0, 1)  # red
 
-        # TODO: if connected => deploy changes if changes has content
+
+        if self.ids.connection_status.text == "Connected":
+            # Deploy changes
+            with open(DATA_FILE_CHANGES, "r") as f:
+                # Load changes
+                changes = json.load(f)
+                if len(changes) == 0:
+                    #print('No changes')
+                    pass
+                else:
+                    # Deploy changes
+                    self.deploy_changes(changes)
+                
+                    # When all changes are deployed, clear the json file
+                    with open(DATA_FILE_CHANGES, "w") as f:
+                        json.dump([], f)
 
     def on_kv_post(self, base_widget):
         myapp.rw = self
@@ -213,27 +231,32 @@ class RootWidget(BoxLayout):
             elif store == 'Allerlei':
                 self.outputcontent4.items.append(formatted) 
 
-    def send_to_backend(self, ct, itemname):
+    def add_to_backend(self, ct, item_name):
+        # Adding an item to the backend if possible, 
         url = myapp.url + "items/add"
         data = { 
-            'name': str(itemname),
+            'name': str(item_name),
             'store': ct
             }
-        try:
-            response = requests.post(url, json=data)
-            print("Server response:", response.json())
-        except Exception as e:
-            print("Error sending data:", e)
-        finally:
-            # pass
-            # Save locally
-            self.save_local_all()
+        status = myapp.rw.ids.connection_status.text
+        if status == 'Connected':
+            try:
+                response = requests.post(url, json=data)
+                print("Server response:", response.json())
+            except Exception as e:
+                print("Error sending data:", e)
+            finally:
+                # pass
+                # Save locally
+                self.save_local_all()
+        elif status == "No Connection":
+            myapp.rw.add_change_local(item_name,ct,'add')
+            
 
     def add_item(self):
         #print(self.give_current_tab_name())
         # always prints Default Tab
         ct = myapp.curr_tab
-        print(f'Current tab: {ct}')
         if ct == 'Lidl':
             itemlist = self.outputcontent1
             input = self.inputcontent1
@@ -246,7 +269,6 @@ class RootWidget(BoxLayout):
         elif ct == 'Allerlei':
             itemlist = self.outputcontent4
             input = self.inputcontent4
-        print('Current tab: ',ct)
 
         if input.text != "":
             # Save item
@@ -259,7 +281,7 @@ class RootWidget(BoxLayout):
             input.text = ""
 
             # and send it to the backend
-            self.send_to_backend(ct,item)
+            self.add_to_backend(ct,item)
     
     def clear_tab(self):
 
@@ -324,6 +346,27 @@ class RootWidget(BoxLayout):
             print('Loading local data')
         
         return data
+    
+    def add_change_local(self, item_name, curr_tab, action):
+        data = { 
+            'name': str(item_name),
+            'store': curr_tab,
+            'action': action
+        }
+        with open(DATA_FILE_CHANGES, "r") as f:
+            changes = json.load(f)
+            changes.append(data)
+        with open(DATA_FILE_CHANGES, "w") as f:
+            json.dump(changes, f, indent=2)
+            print('Saved change to local file')
+
+    def deploy_changes(self,changes):
+        for change in changes:
+            action = change['action']
+            if action == 'remove':
+                myapp.sb.remove_item_in_backend( change['store'], change['name'])
+            elif action == 'add':
+                self.add_to_backend(change['store'], change['name'])
 
     def get_itemlist(self):
         ct = myapp.curr_tab
@@ -358,6 +401,10 @@ class MyshoppingApp(App):
         self.tp = tp
         self.curr_tab = tp.current_tab
         self.curr_tab = 'Lidl'
+
+        # Initialize selectable box
+        sb = SelectableBox()
+        self.sb = sb
         return rw
     
 myapp = MyshoppingApp()
