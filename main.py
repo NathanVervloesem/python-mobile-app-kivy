@@ -12,10 +12,10 @@ import os
 import json
 import requests
 
-DATA_FILE = 'items.json'
+DATA_FILE_ITEMS = 'items.json'
 #Ensure the file exists
-if not os.path.exists(DATA_FILE):
-    with open(DATA_FILE, "w") as f:
+if not os.path.exists(DATA_FILE_ITEMS):
+    with open(DATA_FILE_ITEMS, "w") as f:
         json.dump([], f)
 
 # with open('items.json', 'w') as f:
@@ -58,18 +58,24 @@ class SelectableBox(RecycleDataViewBehavior, BoxLayout):
 
     def remove_item_in_backend(self, curr_tab):
         # Try to communicate with backend
-        item_formatted = self.text
-        item_name = item_formatted#[2:]
-        try:
-            url = myapp.url + "items/remove"
-            response = requests.post(url, json={"name": item_name, "store": curr_tab})
-            print("Server response:", response.json())
-        except Exception as e:
-            print("Error sending data:", e)
-        finally:
-            
-            # Save changes locally
-            myapp.rw.save_local()
+        status = myapp.rw.ids.connection_status.text
+        if status == 'Connected':
+            item_formatted = self.text
+            item_name = item_formatted#[2:]
+            try:
+                url = myapp.url + "items/remove"
+                response = requests.post(url, json={"name": item_name, "store": curr_tab})
+                print("Server response:", response.json())
+            except Exception as e:
+                print("Error sending data:", e)
+            finally:
+                
+                # Save changes locally
+                myapp.rw.save_local_all()
+
+        elif status == "No Connection":
+            pass #TODO 
+
 
 class Tabs(TabbedPanel):
     def __init__(self, **kwargs):
@@ -109,12 +115,35 @@ class RootWidget(BoxLayout):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        Clock.schedule_interval(self.check_connection, 5)  # every 5 seconds
+
+    
+    def check_connection(self, dt):
+        try:
+            # Ping a lightweight endpoint from your FastAPI (e.g., GET /ping)
+            response = requests.get(myapp.url + "ping", timeout=2)
+            if response.status_code == 200:
+                self.ids.connection_status.text = "Connected"
+                self.ids.connection_status.color = (0, 1, 0, 1)  # green
+            else:
+                self.ids.connection_status.text = "Unreachable"
+                self.ids.connection_status.color = (1, 0.5, 0, 1)  # orange
+        except Exception:
+            self.ids.connection_status.text = "No Connection"
+            self.ids.connection_status.color = (1, 0, 0, 1)  # red
+
+        # TODO: if connected => deploy changes if changes has content
 
     def on_kv_post(self, base_widget):
         myapp.rw = self
         self.load_items()
 
     def load_items(self):
+
+        # Doing check on outputcontent
+        if not self.outputcontent1:
+            print("WARNING: outputcontent1 is None — probably called too early.")
+
         # GET from backend
         url = myapp.url + "items/"
         
@@ -146,7 +175,7 @@ class RootWidget(BoxLayout):
 
 
                 # Save locally 
-                self.save_local()
+                self.save_local_all()
                         
             
         except Exception as e:
@@ -198,12 +227,13 @@ class RootWidget(BoxLayout):
         finally:
             # pass
             # Save locally
-            self.save_local()
+            self.save_local_all()
 
     def add_item(self):
         #print(self.give_current_tab_name())
         # always prints Default Tab
         ct = myapp.curr_tab
+        print(f'Current tab: {ct}')
         if ct == 'Lidl':
             itemlist = self.outputcontent1
             input = self.inputcontent1
@@ -251,13 +281,13 @@ class RootWidget(BoxLayout):
         finally:
             # pass
             # Save locally
-            self.save_local()
+            self.save_local_all()
 
 
-    def save_local(self):
+    def save_local_all(self):
             
         # Save all items to JSON file, inefficient but fine for now
-        with open(DATA_FILE, "r") as f:
+        with open(DATA_FILE_ITEMS, "r") as f:
             #items = [json.load(f)]
             items = []
             for i in self.outputcontent1.items:
@@ -284,12 +314,12 @@ class RootWidget(BoxLayout):
                     'store': 'Allerlei'
                 }                 
                 items.append(item)
-        with open(DATA_FILE, "w") as f:
+        with open(DATA_FILE_ITEMS, "w") as f:
             json.dump(items, f, indent=2)
             print('Saved to local file')
     
     def load_local(self):
-        with open(DATA_FILE, "r") as f:
+        with open(DATA_FILE_ITEMS, "r") as f:
             data = json.load(f)
             print('Loading local data')
         
@@ -305,6 +335,8 @@ class RootWidget(BoxLayout):
             itemlist = myapp.rw.outputcontent3 
         elif ct == 'Allerlei':
             itemlist = myapp.rw.outputcontent4 
+        else:
+            print('Error: tab not found')
 
 
         return itemlist
@@ -325,7 +357,7 @@ class MyshoppingApp(App):
         tp.bind(current_tab=tp.on_current_tab)
         self.tp = tp
         self.curr_tab = tp.current_tab
-       
+        self.curr_tab = 'Lidl'
         return rw
     
 myapp = MyshoppingApp()
