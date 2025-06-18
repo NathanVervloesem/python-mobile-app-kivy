@@ -136,7 +136,7 @@ class RootWidget(BoxLayout):
 
     def convert_data(self, data):
         for item in data:
-            formatted = f'{item['name']}'
+            formatted = item['name']
             store = item['store']
             if store == 'Lidl':
                 self.outputcontent1.items.append(formatted)
