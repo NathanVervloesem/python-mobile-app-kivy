@@ -294,16 +294,20 @@ class RootWidget(BoxLayout):
         self.clear_tab_backend(myapp.curr_tab)   
     
     def clear_tab_backend(self, ct):
-        try:
-            url = myapp.url + "items/clear_tab"
-            response = requests.post(url, json={"name": "item", "store": ct})
-            print("Server response:", response.json())
-        except Exception as e:
-            print("Error sending data:", e)   
-        finally:
-            # pass
-            # Save locally
-            self.save_local_all()
+        status = myapp.rw.ids.connection_status.text
+        if status == "Connected":
+            try:
+                url = myapp.url + "items/clear_tab"
+                response = requests.post(url, json={"name": "item", "store": ct})
+                print("Server response:", response.json())
+            except Exception as e:
+                print("Error sending data:", e)   
+            finally:
+                # Save locally
+                self.save_local_all()
+
+        elif status == "No Connection":
+            myapp.rw.add_change_local('',ct,'remove tab')
 
 
     def save_local_all(self):
@@ -367,6 +371,10 @@ class RootWidget(BoxLayout):
                 myapp.sb.remove_item_in_backend( change['store'], change['name'])
             elif action == 'add':
                 self.add_to_backend(change['store'], change['name'])
+            elif action == 'remove tab':
+                self.clear_tab_backend(change['store'])
+            else:
+                print('Action unknown')
 
     def get_itemlist(self):
         ct = myapp.curr_tab
