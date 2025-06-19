@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "name": "peren",
+    "store": "Lidl"
+  },
+  {
+    "name": "frieten",
+    "store": "Lidl"
+  },
+  {
+    "name": "water",
+    "store": "Lidl"
+  },
+  {
+    "name": "gr",
+    "store": "Aldi"
+  }
+]

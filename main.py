@@ -7,21 +7,14 @@ from kivy.clock import Clock
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.properties import StringProperty
 from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
-
+from utils.data_utils import get_data_difference
 import os
 import json
 import requests
 
-DATA_FILE_ITEMS = 'items.json'
-#Ensure the file exists
-if not os.path.exists(DATA_FILE_ITEMS):
-    with open(DATA_FILE_ITEMS, "w") as f:
-        json.dump([], f)
 
+DATA_FILE_ITEMS = 'items.json'
 DATA_FILE_CHANGES = 'changes.json'
-if not os.path.exists(DATA_FILE_CHANGES):
-    with open(DATA_FILE_CHANGES, "w") as f:
-        json.dump([], f)
 
 # class FirstPage(BoxLayout):
 #     def __init__(self):
@@ -151,6 +144,9 @@ class RootWidget(BoxLayout):
                     # When all changes are deployed, clear the json file
                     with open(DATA_FILE_CHANGES, "w") as f:
                         json.dump([], f)
+            
+            # Load items
+            self.load_items()
 
     def on_kv_post(self, base_widget):
         myapp.rw = self
@@ -168,10 +164,18 @@ class RootWidget(BoxLayout):
         # Try to request data from backend
         try:
             response = requests.get(url)
+            print(response)
  
             try:
                 # Get the data from json
                 data = response.json()
+                print(f'Data from response {data}')
+
+                # If decoding error, load locally
+                data_local = self.load_local()
+
+                # Get the difference 
+                data, data_rem_backend, data_added_backend = get_data_difference(data, data_local)
                    
             except Exception as e:
                 print(f"JSON decode error: {e}")
@@ -179,11 +183,17 @@ class RootWidget(BoxLayout):
                 # If decoding error, load locally
                 data = self.load_local()
 
+                # not comparison with local data is needed
+                data_rem_backend = []
+                data_added_backend = []
+
 
             finally:
 
                 # Get the data in the correct format
-                self.convert_data(data)
+                self.convert_data_rem(data_rem_backend)
+                self.convert_data(data_added_backend)
+
                        
                 # update
                 self.outputcontent1.update()
@@ -202,15 +212,12 @@ class RootWidget(BoxLayout):
             # If connection error, load locally
             data = self.load_local()
 
-            # Gives error that self.outputcontent1.items does not exist
+            # No comparison needed because only local data available
+
+            # Convert data
             self.convert_data(data)
 
-            # print(data)
- 
-            # Get the data in the correct format
-            #self.convert_data(data)
-
-            # update
+            # update display
             self.outputcontent1.update()
             self.outputcontent2.update()
             self.outputcontent3.update()
@@ -227,9 +234,23 @@ class RootWidget(BoxLayout):
             elif store == 'Aldi':
                 self.outputcontent2.items.append(formatted)
             elif store == 'Carrefour':
-                self.outputcontent3.items.append(formatted)         
+                self.outputcontent3.items.append(formatted)
             elif store == 'Allerlei':
                 self.outputcontent4.items.append(formatted) 
+
+    def convert_data_rem(self, data):
+        for item in data:
+            formatted = item['name']
+            store = item['store']
+            if store == 'Lidl':
+                self.outputcontent1.items.remove(formatted)
+            elif store == 'Aldi':
+                self.outputcontent2.items.remove(formatted)
+            elif store == 'Carrefour':
+                self.outputcontent3.items.remove(formatted)
+            elif store == 'Allerlei':
+                self.outputcontent4.items.remove(formatted) 
+
 
     def add_to_backend(self, ct, item_name):
         # Adding an item to the backend if possible, 
@@ -345,6 +366,7 @@ class RootWidget(BoxLayout):
             print('Saved to local file')
     
     def load_local(self):
+        #with open(myapp.path_items, "r") as f:
         with open(DATA_FILE_ITEMS, "r") as f:
             data = json.load(f)
             print('Loading local data')
@@ -400,6 +422,20 @@ class MyshoppingApp(App):
         #self.url = 'http://127.0.0.1:8080/'
 
     def build(self):
+        # Initialize data files
+        # Path for Android application
+        self.path_items = os.path.join(App.get_running_app().user_data_dir, 'items.json')
+        self.path_changes = os.path.join(App.get_running_app().user_data_dir, 'changes.json')
+
+        #Ensure the file exists
+        if not os.path.exists(DATA_FILE_ITEMS):
+            with open(DATA_FILE_ITEMS, "w") as f:
+                json.dump([], f)
+
+        if not os.path.exists(DATA_FILE_CHANGES):
+            with open(DATA_FILE_CHANGES, "w") as f:
+                json.dump([], f)
+
         # Initialize Rootwidget
         rw = RootWidget()
 
@@ -413,6 +449,9 @@ class MyshoppingApp(App):
         # Initialize selectable box
         sb = SelectableBox()
         self.sb = sb
+
+
+
         return rw
     
 myapp = MyshoppingApp()
