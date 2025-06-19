@@ -53,8 +53,7 @@ class SelectableBox(RecycleDataViewBehavior, BoxLayout):
 
     def remove_item_in_backend(self, curr_tab, item_name):
         # Try to communicate with backend
-        status = myapp.rw.ids.connection_status.text
-        if status == 'Connected':
+        if  myapp.rw.ids.connection_status.connected:
             
             try:
                 url = myapp.url + "items/remove"
@@ -67,7 +66,7 @@ class SelectableBox(RecycleDataViewBehavior, BoxLayout):
                 # Save changes locally
                 myapp.rw.save_local_all()
 
-        elif status == "No Connection":
+        else:
             myapp.rw.add_change_local(item_name,curr_tab,'remove')
 
 
@@ -119,17 +118,20 @@ class RootWidget(BoxLayout):
             response = requests.get(myapp.url + "ping", timeout=2)
             if response.status_code == 200:
                 self.ids.connection_status.text = "Connected"
+                self.ids.connection_status.connected = True # 1 if connected, 0 if not connected
                 self.ids.connection_status.color = (0, 1, 0, 1)  # green
 
             else:
                 self.ids.connection_status.text = "Unreachable"
+                self.ids.connection_status.connected = False
                 self.ids.connection_status.color = (1, 0.5, 0, 1)  # orange
         except Exception:
             self.ids.connection_status.text = "No Connection"
+            self.ids.connection_status.connected = False
             self.ids.connection_status.color = (1, 0, 0, 1)  # red
 
 
-        if self.ids.connection_status.text == "Connected":
+        if self.ids.connection_status.connected:
             # Deploy changes
             with open(DATA_FILE_CHANGES, "r") as f:
                 # Load changes
@@ -259,8 +261,7 @@ class RootWidget(BoxLayout):
             'name': str(item_name),
             'store': ct
             }
-        status = myapp.rw.ids.connection_status.text
-        if status == 'Connected':
+        if myapp.rw.ids.connection_status.connected:
             try:
                 response = requests.post(url, json=data)
                 print("Server response:", response.json())
@@ -270,7 +271,7 @@ class RootWidget(BoxLayout):
                 # pass
                 # Save locally
                 self.save_local_all()
-        elif status == "No Connection":
+        else:
             myapp.rw.add_change_local(item_name,ct,'add')
             
 
@@ -315,8 +316,7 @@ class RootWidget(BoxLayout):
         self.clear_tab_backend(myapp.curr_tab)   
     
     def clear_tab_backend(self, ct):
-        status = myapp.rw.ids.connection_status.text
-        if status == "Connected":
+        if myapp.rw.ids.connection_status.connected:
             try:
                 url = myapp.url + "items/clear_tab"
                 response = requests.post(url, json={"name": "item", "store": ct})
@@ -327,7 +327,7 @@ class RootWidget(BoxLayout):
                 # Save locally
                 self.save_local_all()
 
-        elif status == "No Connection":
+        else:
             myapp.rw.add_change_local('',ct,'remove tab')
 
 
