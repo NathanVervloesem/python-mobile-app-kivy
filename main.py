@@ -10,17 +10,28 @@ from kivy.uix.tabbedpanel import TabbedPanel
 from kivy.utils import platform
 
 # Function from other files
-from utils.data_utils import get_itemlist, get_input
-from backend.backend_interaction import remove_item_in_backend, add_to_backend, clear_tab_backend, load_items, deploy_changes_wrapper
+from backend.backend_interaction import add_to_backend, clear_tab_backend, deploy_changes_wrapper, load_items, remove_item_in_backend
+from utils.data_utils import get_input, get_itemlist
+
 
 # External imports
-import os
 import json
+import os
 import requests
-import pprint
 
 DATA_FILE_ITEMS = 'items.json'
 DATA_FILE_CHANGES = 'changes.json'
+
+def get_item_file_path(filename):
+    if platform == 'android':
+        return os.path.join(App.get_running_app().user_data_dir, filename)
+    else:
+        return filename
+    
+def check_file_existence(filename):
+    if not os.path.exists(filename):
+        with open(filename, "w") as f:
+            json.dump([], f)
 
 # class FirstPage(BoxLayout):
 #     def __init__(self):
@@ -98,7 +109,7 @@ class RootWidget(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         Clock.schedule_interval(self.check_connection, 5)  # every 5 seconds
-        
+
     def set_labels(self):
         self.outputcontent1.label = 'Lidl'
         self.outputcontent2.label = 'Aldi'
@@ -185,17 +196,15 @@ class MyshoppingApp(App):
     def build(self):
         # Initialize data files
         # Path for Android application
-        self.path_items = os.path.join(App.get_running_app().user_data_dir, 'items.json')
-        self.path_changes = os.path.join(App.get_running_app().user_data_dir, 'changes.json')
+        self.path_items = get_item_file_path(DATA_FILE_ITEMS)
+        self.path_changes = get_item_file_path(DATA_FILE_CHANGES)
 
-        #Ensure the file exists
-        if not os.path.exists(DATA_FILE_ITEMS):
-            with open(DATA_FILE_ITEMS, "w") as f:
-                json.dump([], f)
+        print(self.path_items)
+        print(self.path_changes)
 
-        if not os.path.exists(DATA_FILE_CHANGES):
-            with open(DATA_FILE_CHANGES, "w") as f:
-                json.dump([], f)
+        # Ensure the file exists
+        check_file_existence(self.path_items)
+        check_file_existence(self.path_changes)
 
         # Initialize Rootwidget
         rw = RootWidget()

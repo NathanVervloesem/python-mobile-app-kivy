@@ -1,18 +1,16 @@
 import json
 
-DATA_FILE_ITEMS = 'items.json'
-DATA_FILE_CHANGES = 'changes.json'
 
-def load_local():
+def load_local(myapp):
     '''
         Load locally saved data
     '''
-    with open(DATA_FILE_ITEMS, "r") as f:
+    with open(myapp.path_items, "r") as f:
         data = json.load(f)
         print('Loading local data')
     return data
 
-def add_change_local(item_name, curr_tab, action):
+def add_change_local(myapp, item_name, curr_tab, action):
     ''' 
         Save a change to the local changes.json
     '''
@@ -21,10 +19,10 @@ def add_change_local(item_name, curr_tab, action):
         'store': curr_tab,
         'action': action
     }
-    with open(DATA_FILE_CHANGES, "r") as f:
+    with open(myapp.path_changes, "r") as f:
         changes = json.load(f)
         changes.append(data)
-    with open(DATA_FILE_CHANGES, "w") as f:
+    with open(myapp.path_changes, "w") as f:
         json.dump(changes, f, indent=2)
         print('Saved change to local file')
 
@@ -44,7 +42,7 @@ def save_local_all(myapp):
                 'store': outputcontent.label
             }                 
             items.append(item)
-    with open(DATA_FILE_ITEMS, "w") as f:
+    with open(myapp.path_items, "w") as f:
         json.dump(items, f, indent=2)
         print('Saved to local file')
 

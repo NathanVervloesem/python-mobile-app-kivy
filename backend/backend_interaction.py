@@ -3,8 +3,6 @@ import json
 from backend.localstorage_interaction import add_change_local, save_local_all, load_local
 from utils.data_utils import get_data_difference, convert_data, convert_data_rem, update_outputcontent
 
-DATA_FILE_CHANGES = 'changes.json'
-
 def do_post_request(myapp, url, data):
     '''
         Do post request and save locally
@@ -41,7 +39,7 @@ def load_items(myapp):
             print(f'Data from response {data}')
 
             # If decoding error, load locally
-            data_local = load_local()
+            data_local = load_local(myapp)
 
             # Get the difference 
             data, data_rem_backend, data_added_backend = get_data_difference(data, data_local)
@@ -50,7 +48,7 @@ def load_items(myapp):
             print(f"JSON decode error: {e}")
 
             # If decoding error, load locally
-            data = load_local()
+            data = load_local(myapp)
 
             # not comparison with local data is needed
             data_rem_backend = []
@@ -74,7 +72,7 @@ def load_items(myapp):
         print(f"Error Unexpected status code: {e}")
 
         # If connection error, load locally
-        data = load_local()
+        data = load_local(myapp)
 
         # No comparison needed because only local data available
 
@@ -97,7 +95,7 @@ def remove_item_in_backend(myapp, curr_tab, item_name):
         }
         do_post_request(myapp, url, data)
     else:
-        add_change_local(item_name,curr_tab,'remove')
+        add_change_local(myapp, item_name,curr_tab,'remove')
 
 def add_to_backend(myapp, ct, item_name):
     '''
@@ -111,7 +109,7 @@ def add_to_backend(myapp, ct, item_name):
         }
         do_post_request(myapp, url, data)
     else:
-        add_change_local(item_name,ct,'add')
+        add_change_local(myapp, item_name, ct, 'add')
 
 def clear_tab_backend(myapp, ct):
     '''
@@ -125,7 +123,7 @@ def clear_tab_backend(myapp, ct):
         }
         do_post_request(myapp, url, data)
     else:
-        add_change_local('',ct,'remove tab')
+        add_change_local(myapp, '',ct,'remove tab')
 
 
 def deploy_changes(myapp,changes):
@@ -144,7 +142,10 @@ def deploy_changes(myapp,changes):
             print('Action unknown')
 
 def deploy_changes_wrapper(myapp):
-    with open(DATA_FILE_CHANGES, "r") as f:
+    '''
+        Wrapper for function deploy_changes where the changes.json is read and cleared.
+    '''
+    with open(myapp.path_changes, "r") as f:
         # Load changes
         changes = json.load(f)
         if len(changes) == 0:
@@ -155,5 +156,5 @@ def deploy_changes_wrapper(myapp):
             deploy_changes(myapp, changes)
         
             # When all changes are deployed, clear the json file
-            with open(DATA_FILE_CHANGES, "w") as f:
+            with open(myapp.path_changes, "w") as f:
                 json.dump([], f)
