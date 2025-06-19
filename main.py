@@ -7,7 +7,8 @@ from kivy.clock import Clock
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.properties import StringProperty
 from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
-from utils.data_utils import get_data_difference
+from utils.data_utils import get_data_difference, get_itemlist
+from backend.backend_interaction import remove_item_in_backend, add_to_backend, clear_tab_backend
 import os
 import json
 import requests
@@ -40,7 +41,7 @@ class SelectableBox(RecycleDataViewBehavior, BoxLayout):
     def on_button_click(self):
         print('Current tab remove: ',myapp.curr_tab)
 
-        itemlist = myapp.rw.get_itemlist()      
+        itemlist = get_itemlist()      
         
         itemlist.items.remove(self.text)
         itemlist.update()
@@ -48,27 +49,7 @@ class SelectableBox(RecycleDataViewBehavior, BoxLayout):
         print(f"Button clicked of item: {self.text}")
 
         # Communicate with backend to remove the item
-        self.remove_item_in_backend(myapp.curr_tab,self.text)
-
-
-    def remove_item_in_backend(self, curr_tab, item_name):
-        # Try to communicate with backend
-        if  myapp.rw.ids.connection_status.connected:
-            
-            try:
-                url = myapp.url + "items/remove"
-                response = requests.post(url, json={"name": item_name, "store": curr_tab})
-                print("Server response:", response.json())
-            except Exception as e:
-                print("Error sending data:", e)
-            finally:
-                
-                # Save changes locally
-                myapp.rw.save_local_all()
-
-        else:
-            myapp.rw.add_change_local(item_name,curr_tab,'remove')
-
+        remove_item_in_backend(myapp,myapp.curr_tab,self.text)
 
 
 class Tabs(TabbedPanel):
@@ -152,7 +133,7 @@ class RootWidget(BoxLayout):
 
     def on_kv_post(self, base_widget):
         myapp.rw = self
-        self.load_items()
+        myapp.rw.load_items()
 
     def load_items(self):
 
@@ -254,27 +235,6 @@ class RootWidget(BoxLayout):
                 self.outputcontent4.items.remove(formatted) 
 
 
-    def add_to_backend(self, ct, item_name):
-        # Adding an item to the backend if possible, 
-        url = myapp.url + "items/add"
-        data = { 
-            'name': str(item_name),
-            'store': ct
-            }
-        if myapp.rw.ids.connection_status.connected:
-            try:
-                response = requests.post(url, json=data)
-                print("Server response:", response.json())
-            except Exception as e:
-                print("Error sending data:", e)
-            finally:
-                # pass
-                # Save locally
-                self.save_local_all()
-        else:
-            myapp.rw.add_change_local(item_name,ct,'add')
-            
-
     def add_item(self):
         #print(self.give_current_tab_name())
         # always prints Default Tab
@@ -303,33 +263,18 @@ class RootWidget(BoxLayout):
             input.text = ""
 
             # and send it to the backend
-            self.add_to_backend(ct,item)
+            add_to_backend(myapp,ct,item)
     
     def clear_tab(self):
 
-        itemlist = self.get_itemlist() 
+        itemlist = get_itemlist() 
 
         itemlist.items = [] 
         itemlist.update()   
 
         # Send this to backend
-        self.clear_tab_backend(myapp.curr_tab)   
+        clear_tab_backend(myapp, myapp.curr_tab)   
     
-    def clear_tab_backend(self, ct):
-        if myapp.rw.ids.connection_status.connected:
-            try:
-                url = myapp.url + "items/clear_tab"
-                response = requests.post(url, json={"name": "item", "store": ct})
-                print("Server response:", response.json())
-            except Exception as e:
-                print("Error sending data:", e)   
-            finally:
-                # Save locally
-                self.save_local_all()
-
-        else:
-            myapp.rw.add_change_local('',ct,'remove tab')
-
 
     def save_local_all(self):
             
@@ -398,21 +343,6 @@ class RootWidget(BoxLayout):
             else:
                 print('Action unknown')
 
-    def get_itemlist(self):
-        ct = myapp.curr_tab
-        if ct == 'Lidl':
-            itemlist = myapp.rw.outputcontent1
-        elif ct == 'Aldi':
-            itemlist = myapp.rw.outputcontent2
-        elif ct == 'Carrefour':
-            itemlist = myapp.rw.outputcontent3 
-        elif ct == 'Allerlei':
-            itemlist = myapp.rw.outputcontent4 
-        else:
-            print('Error: tab not found')
-
-
-        return itemlist
 
 class MyshoppingApp(App):
     def __init__(self):

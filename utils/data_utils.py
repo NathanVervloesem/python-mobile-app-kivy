@@ -18,3 +18,18 @@ def get_data_difference(list_backend, list_local):
         print('Backend and local are identical')
 
     return diff, diff_rem_backend, diff_added_backend
+
+def get_itemlist(myapp):
+    ct = myapp.curr_tab
+    if ct == 'Lidl':
+        itemlist = myapp.rw.outputcontent1
+    elif ct == 'Aldi':
+        itemlist = myapp.rw.outputcontent2
+    elif ct == 'Carrefour':
+        itemlist = myapp.rw.outputcontent3 
+    elif ct == 'Allerlei':
+        itemlist = myapp.rw.outputcontent4 
+    else:
+        print('Error: tab not found')
+
+    return itemlist
