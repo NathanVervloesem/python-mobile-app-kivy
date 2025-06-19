@@ -1,18 +1,23 @@
+# Kivy imports
 from kivy.app import App
+from kivy.clock import Clock
+from kivy.properties import ObjectProperty, StringProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.recycleview import RecycleView
-from kivy.properties import ObjectProperty
-from kivy.uix.tabbedpanel import TabbedPanel
-from kivy.clock import Clock
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
-from kivy.properties import StringProperty
 from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
-from utils.data_utils import get_data_difference, get_itemlist
+from kivy.uix.tabbedpanel import TabbedPanel
+from kivy.utils import platform
+
+# Function from other files
+from utils.data_utils import get_data_difference, get_itemlist, get_input, convert_data, convert_data_rem, update_outputcontent
 from backend.backend_interaction import remove_item_in_backend, add_to_backend, clear_tab_backend
+from backend.localstorage_interaction import load_local, save_local_all
+
+# External imports
 import os
 import json
 import requests
-
 
 DATA_FILE_ITEMS = 'items.json'
 DATA_FILE_CHANGES = 'changes.json'
@@ -41,7 +46,7 @@ class SelectableBox(RecycleDataViewBehavior, BoxLayout):
     def on_button_click(self):
         print('Current tab remove: ',myapp.curr_tab)
 
-        itemlist = get_itemlist()      
+        itemlist = get_itemlist(myapp,myapp.curr_tab)      
         
         itemlist.items.remove(self.text)
         itemlist.update()
@@ -70,6 +75,7 @@ class ListWidget(RecycleView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.items = []
+        # self.label = ''
 
 class RootWidget(BoxLayout):
     inputbutton1 = ObjectProperty(None)
@@ -91,7 +97,6 @@ class RootWidget(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         Clock.schedule_interval(self.check_connection, 5)  # every 5 seconds
-
     
     def check_connection(self, dt):
         try:
@@ -111,7 +116,7 @@ class RootWidget(BoxLayout):
             self.ids.connection_status.connected = False
             self.ids.connection_status.color = (1, 0, 0, 1)  # red
 
-
+        # Separate function - #TODO
         if self.ids.connection_status.connected:
             # Deploy changes
             with open(DATA_FILE_CHANGES, "r") as f:
@@ -133,7 +138,14 @@ class RootWidget(BoxLayout):
 
     def on_kv_post(self, base_widget):
         myapp.rw = self
+        # myapp.rw.set_labels()
         myapp.rw.load_items()
+
+    # def set_labels(self):
+    #     self.outputcontent1.label = 'Lidl'
+    #     self.outputcontent2.label = 'Aldi'
+    #     self.outputcontent3.label = 'Carrefour'
+    #     self.outputcontent4.label = 'Allerlei'
 
     def load_items(self):
 
@@ -155,7 +167,7 @@ class RootWidget(BoxLayout):
                 print(f'Data from response {data}')
 
                 # If decoding error, load locally
-                data_local = self.load_local()
+                data_local = load_local()
 
                 # Get the difference 
                 data, data_rem_backend, data_added_backend = get_data_difference(data, data_local)
@@ -164,7 +176,7 @@ class RootWidget(BoxLayout):
                 print(f"JSON decode error: {e}")
 
                 # If decoding error, load locally
-                data = self.load_local()
+                data = load_local()
 
                 # not comparison with local data is needed
                 data_rem_backend = []
@@ -174,100 +186,57 @@ class RootWidget(BoxLayout):
             finally:
 
                 # Get the data in the correct format
-                self.convert_data_rem(data_rem_backend)
-                self.convert_data(data_added_backend)
-
+                convert_data_rem(myapp, data_rem_backend)
+                convert_data(myapp, data_added_backend,)
                        
                 # update
-                self.outputcontent1.update()
-                self.outputcontent2.update()
-                self.outputcontent3.update()
-                self.outputcontent4.update()
-
+                update_outputcontent(myapp)
 
                 # Save locally 
-                self.save_local_all()
+                save_local_all(myapp)
                         
             
         except Exception as e:
             print(f"Error Unexpected status code: {e}")
 
             # If connection error, load locally
-            data = self.load_local()
+            data = load_local()
 
             # No comparison needed because only local data available
 
             # Convert data
-            self.convert_data(data)
+            convert_data(myapp, data)
 
             # update display
-            self.outputcontent1.update()
-            self.outputcontent2.update()
-            self.outputcontent3.update()
-            self.outputcontent4.update()
-   
-        
-
-    def convert_data(self, data):
-        for item in data:
-            formatted = item['name']
-            store = item['store']
-            if store == 'Lidl':
-                self.outputcontent1.items.append(formatted)
-            elif store == 'Aldi':
-                self.outputcontent2.items.append(formatted)
-            elif store == 'Carrefour':
-                self.outputcontent3.items.append(formatted)
-            elif store == 'Allerlei':
-                self.outputcontent4.items.append(formatted) 
-
-    def convert_data_rem(self, data):
-        for item in data:
-            formatted = item['name']
-            store = item['store']
-            if store == 'Lidl':
-                self.outputcontent1.items.remove(formatted)
-            elif store == 'Aldi':
-                self.outputcontent2.items.remove(formatted)
-            elif store == 'Carrefour':
-                self.outputcontent3.items.remove(formatted)
-            elif store == 'Allerlei':
-                self.outputcontent4.items.remove(formatted) 
+            update_outputcontent(myapp)
 
 
     def add_item(self):
-        #print(self.give_current_tab_name())
-        # always prints Default Tab
-        ct = myapp.curr_tab
-        if ct == 'Lidl':
-            itemlist = self.outputcontent1
-            input = self.inputcontent1
-        elif ct == 'Aldi':
-            itemlist = self.outputcontent2
-            input = self.inputcontent2
-        elif ct == 'Carrefour':
-            itemlist = self.outputcontent3 
-            input = self.inputcontent3
-        elif ct == 'Allerlei':
-            itemlist = self.outputcontent4
-            input = self.inputcontent4
+        '''
+            Add an item in the tab
+        '''
+
+        itemlist = get_itemlist(myapp, myapp.curr_tab)
+        input = get_input(myapp, myapp.curr_tab)
 
         if input.text != "":
             # Save item
             item = input.text
             # Get correct tab
             print( itemlist.items)
-            formatted = f'{item}'
-            itemlist.items.append(formatted)
+            itemlist.items.append(item)
             itemlist.update()
             input.text = ""
 
             # and send it to the backend
-            add_to_backend(myapp,ct,item)
+            add_to_backend(myapp,myapp.curr_tab,item)
     
     def clear_tab(self):
+        '''
+            Clears a tab completely
+        '''
 
-        itemlist = get_itemlist() 
+        itemlist = get_itemlist(myapp, myapp.curr_tab) 
 
         itemlist.items = [] 
         itemlist.update()   
@@ -276,70 +245,18 @@ class RootWidget(BoxLayout):
         clear_tab_backend(myapp, myapp.curr_tab)   
     
 
-    def save_local_all(self):
-            
-        # Save all items to JSON file, inefficient but fine for now
-        with open(DATA_FILE_ITEMS, "r") as f:
-            #items = [json.load(f)]
-            items = []
-            for i in self.outputcontent1.items:
-                item = { 
-                    'name': str(i),
-                    'store': 'Lidl'
-                }                 
-                items.append(item)
-            for i in self.outputcontent2.items:
-                item = { 
-                    'name': str(i),
-                    'store': 'Aldi'
-                }                 
-                items.append(item) 
-            for i in self.outputcontent3.items:
-                item = { 
-                    'name': str(i),
-                    'store': 'Carrefour'
-                }                 
-                items.append(item)
-            for i in self.outputcontent4.items:
-                item = { 
-                    'name': str(i),
-                    'store': 'Allerlei'
-                }                 
-                items.append(item)
-        with open(DATA_FILE_ITEMS, "w") as f:
-            json.dump(items, f, indent=2)
-            print('Saved to local file')
-    
-    def load_local(self):
-        #with open(myapp.path_items, "r") as f:
-        with open(DATA_FILE_ITEMS, "r") as f:
-            data = json.load(f)
-            print('Loading local data')
-        
-        return data
-    
-    def add_change_local(self, item_name, curr_tab, action):
-        data = { 
-            'name': str(item_name),
-            'store': curr_tab,
-            'action': action
-        }
-        with open(DATA_FILE_CHANGES, "r") as f:
-            changes = json.load(f)
-            changes.append(data)
-        with open(DATA_FILE_CHANGES, "w") as f:
-            json.dump(changes, f, indent=2)
-            print('Saved change to local file')
-
     def deploy_changes(self,changes):
+        '''
+            Changes to item store in changes.json are deployed to the backend
+        '''
         for change in changes:
             action = change['action']
             if action == 'remove':
-                myapp.sb.remove_item_in_backend( change['store'], change['name'])
+                remove_item_in_backend(myapp, change['store'], change['name'])
             elif action == 'add':
-                self.add_to_backend(change['store'], change['name'])
+                add_to_backend(myapp, change['store'], change['name'])
             elif action == 'remove tab':
-                self.clear_tab_backend(change['store'])
+                clear_tab_backend(myapp, change['store'])
             else:
                 print('Action unknown')
 

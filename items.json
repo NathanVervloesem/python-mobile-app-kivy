@@ -1,18 +1,10 @@
 [
   {
-    "name": "peren",
+    "name": "sf",
     "store": "Lidl"
   },
   {
-    "name": "frieten",
+    "name": "gras",
     "store": "Lidl"
-  },
-  {
-    "name": "water",
-    "store": "Lidl"
-  },
-  {
-    "name": "gr",
-    "store": "Aldi"
   }
 ]
