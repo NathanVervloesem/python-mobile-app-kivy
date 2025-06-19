@@ -1,6 +1,9 @@
 import requests
-from backend.localstorage_interaction import add_change_local, save_local_all
+import json
+from backend.localstorage_interaction import add_change_local, save_local_all, load_local
+from utils.data_utils import get_data_difference, convert_data, convert_data_rem, update_outputcontent
 
+DATA_FILE_CHANGES = 'changes.json'
 
 def do_post_request(myapp, url, data):
     '''
@@ -14,6 +17,73 @@ def do_post_request(myapp, url, data):
     finally:
         # Save changes locally
         save_local_all(myapp)    
+
+def load_items(myapp):
+    '''
+        Load items. First try from the backend, if that doesn't work load local data. At latest display the items.
+    '''
+
+    # Doing check on outputcontent
+    if not myapp.rw.outputcontent1:
+        print("WARNING: outputcontent1 is None — probably called too early.")
+
+    # GET from backend
+    url = myapp.url + "items/"
+    
+    # Try to request data from backend
+    try:
+        response = requests.get(url)
+        print(response)
+
+        try:
+            # Get the data from json
+            data = response.json()
+            print(f'Data from response {data}')
+
+            # If decoding error, load locally
+            data_local = load_local()
+
+            # Get the difference 
+            data, data_rem_backend, data_added_backend = get_data_difference(data, data_local)
+                
+        except Exception as e:
+            print(f"JSON decode error: {e}")
+
+            # If decoding error, load locally
+            data = load_local()
+
+            # not comparison with local data is needed
+            data_rem_backend = []
+            data_added_backend = []
+
+
+        finally:
+
+            # Get the data in the correct format
+            convert_data_rem(myapp, data_rem_backend)
+            convert_data(myapp, data_added_backend,)
+                    
+            # update
+            update_outputcontent(myapp)
+
+            # Save locally 
+            save_local_all(myapp)
+                    
+        
+    except Exception as e:
+        print(f"Error Unexpected status code: {e}")
+
+        # If connection error, load locally
+        data = load_local()
+
+        # No comparison needed because only local data available
+
+        # Convert data
+        convert_data(myapp, data)
+
+        # update display
+        update_outputcontent(myapp)
+
 
 def remove_item_in_backend(myapp, curr_tab, item_name):
     '''
@@ -56,3 +126,34 @@ def clear_tab_backend(myapp, ct):
         do_post_request(myapp, url, data)
     else:
         add_change_local('',ct,'remove tab')
+
+
+def deploy_changes(myapp,changes):
+    '''
+        Changes to item store in changes.json are deployed to the backend
+    '''
+    for change in changes:
+        action = change['action']
+        if action == 'remove':
+            remove_item_in_backend(myapp, change['store'], change['name'])
+        elif action == 'add':
+            add_to_backend(myapp, change['store'], change['name'])
+        elif action == 'remove tab':
+            clear_tab_backend(myapp, change['store'])
+        else:
+            print('Action unknown')
+
+def deploy_changes_wrapper(myapp):
+    with open(DATA_FILE_CHANGES, "r") as f:
+        # Load changes
+        changes = json.load(f)
+        if len(changes) == 0:
+            #print('No changes')
+            pass
+        else:
+            # Deploy changes
+            deploy_changes(myapp, changes)
+        
+            # When all changes are deployed, clear the json file
+            with open(DATA_FILE_CHANGES, "w") as f:
+                json.dump([], f)

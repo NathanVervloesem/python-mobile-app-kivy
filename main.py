@@ -10,9 +10,8 @@ from kivy.uix.tabbedpanel import TabbedPanel
 from kivy.utils import platform
 
 # Function from other files
-from utils.data_utils import get_data_difference, get_itemlist, get_input, convert_data, convert_data_rem, update_outputcontent
-from backend.backend_interaction import remove_item_in_backend, add_to_backend, clear_tab_backend
-from backend.localstorage_interaction import load_local, save_local_all
+from utils.data_utils import get_itemlist, get_input
+from backend.backend_interaction import remove_item_in_backend, add_to_backend, clear_tab_backend, load_items, deploy_changes_wrapper
 
 # External imports
 import os
@@ -99,7 +98,12 @@ class RootWidget(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         Clock.schedule_interval(self.check_connection, 5)  # every 5 seconds
-
+        
+    def set_labels(self):
+        self.outputcontent1.label = 'Lidl'
+        self.outputcontent2.label = 'Aldi'
+        self.outputcontent3.label = 'Carrefour'
+        self.outputcontent4.label = 'Allerlei'
     
     def check_connection(self, dt):
         try:
@@ -119,102 +123,24 @@ class RootWidget(BoxLayout):
             self.ids.connection_status.connected = False
             self.ids.connection_status.color = (1, 0, 0, 1)  # red
 
-        # Separate function - #TODO
+        # If connected, deploy changes made to backend and load items
         if self.ids.connection_status.connected:
-            # Deploy changes
-            with open(DATA_FILE_CHANGES, "r") as f:
-                # Load changes
-                changes = json.load(f)
-                if len(changes) == 0:
-                    #print('No changes')
-                    pass
-                else:
-                    # Deploy changes
-                    self.deploy_changes(changes)
-                
-                    # When all changes are deployed, clear the json file
-                    with open(DATA_FILE_CHANGES, "w") as f:
-                        json.dump([], f)
+
+            # Deploy changes wrapper
+            deploy_changes_wrapper(myapp)
             
             # Load items
-            self.load_items()
+            load_items(myapp)
 
     def on_kv_post(self, base_widget):
         myapp.rw = self
+        
+        # Define number of tabs and labels
         myapp.rw.number_of_tabs = 4
         myapp.rw.set_labels()
-        myapp.rw.load_items()
-        
 
-    def set_labels(self):
-        self.outputcontent1.label = 'Lidl'
-        self.outputcontent2.label = 'Aldi'
-        self.outputcontent3.label = 'Carrefour'
-        self.outputcontent4.label = 'Allerlei'
-
-    def load_items(self):
-
-        # Doing check on outputcontent
-        if not self.outputcontent1:
-            print("WARNING: outputcontent1 is None — probably called too early.")
-
-        # GET from backend
-        url = myapp.url + "items/"
-        
-        # Try to request data from backend
-        try:
-            response = requests.get(url)
-            print(response)
- 
-            try:
-                # Get the data from json
-                data = response.json()
-                print(f'Data from response {data}')
-
-                # If decoding error, load locally
-                data_local = load_local()
-
-                # Get the difference 
-                data, data_rem_backend, data_added_backend = get_data_difference(data, data_local)
-                   
-            except Exception as e:
-                print(f"JSON decode error: {e}")
-
-                # If decoding error, load locally
-                data = load_local()
-
-                # not comparison with local data is needed
-                data_rem_backend = []
-                data_added_backend = []
-
-
-            finally:
-
-                # Get the data in the correct format
-                convert_data_rem(myapp, data_rem_backend)
-                convert_data(myapp, data_added_backend,)
-                       
-                # update
-                update_outputcontent(myapp)
-
-                # Save locally 
-                save_local_all(myapp)
-                        
-            
-        except Exception as e:
-            print(f"Error Unexpected status code: {e}")
-
-            # If connection error, load locally
-            data = load_local()
-
-            # No comparison needed because only local data available
-
-            # Convert data
-            convert_data(myapp, data)
-
-            # update display
-            update_outputcontent(myapp)
-
+        # Load items
+        load_items(myapp)
 
     def add_item(self):
         '''
@@ -248,23 +174,6 @@ class RootWidget(BoxLayout):
 
         # Send this to backend
         clear_tab_backend(myapp, myapp.curr_tab)   
-    
-
-    def deploy_changes(self,changes):
-        '''
-            Changes to item store in changes.json are deployed to the backend
-        '''
-        for change in changes:
-            action = change['action']
-            if action == 'remove':
-                remove_item_in_backend(myapp, change['store'], change['name'])
-            elif action == 'add':
-                add_to_backend(myapp, change['store'], change['name'])
-            elif action == 'remove tab':
-                clear_tab_backend(myapp, change['store'])
-            else:
-                print('Action unknown')
-
 
 class MyshoppingApp(App):
     def __init__(self):

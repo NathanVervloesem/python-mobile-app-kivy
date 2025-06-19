@@ -47,3 +47,5 @@ def save_local_all(myapp):
     with open(DATA_FILE_ITEMS, "w") as f:
         json.dump(items, f, indent=2)
         print('Saved to local file')
+
+
