@@ -18,6 +18,7 @@ from backend.localstorage_interaction import load_local, save_local_all
 import os
 import json
 import requests
+import pprint
 
 DATA_FILE_ITEMS = 'items.json'
 DATA_FILE_CHANGES = 'changes.json'
@@ -75,7 +76,7 @@ class ListWidget(RecycleView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.items = []
-        # self.label = ''
+        self.label = ''
 
 class RootWidget(BoxLayout):
     inputbutton1 = ObjectProperty(None)
@@ -93,10 +94,12 @@ class RootWidget(BoxLayout):
     inputbutton4 = ObjectProperty(None)
     inputcontent4 = ObjectProperty(None)    
     outputcontent4 = ObjectProperty(None)
+    
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         Clock.schedule_interval(self.check_connection, 5)  # every 5 seconds
+
     
     def check_connection(self, dt):
         try:
@@ -138,14 +141,16 @@ class RootWidget(BoxLayout):
 
     def on_kv_post(self, base_widget):
         myapp.rw = self
-        # myapp.rw.set_labels()
+        myapp.rw.number_of_tabs = 4
+        myapp.rw.set_labels()
         myapp.rw.load_items()
+        
 
-    # def set_labels(self):
-    #     self.outputcontent1.label = 'Lidl'
-    #     self.outputcontent2.label = 'Aldi'
-    #     self.outputcontent3.label = 'Carrefour'
-    #     self.outputcontent4.label = 'Allerlei'
+    def set_labels(self):
+        self.outputcontent1.label = 'Lidl'
+        self.outputcontent2.label = 'Aldi'
+        self.outputcontent3.label = 'Carrefour'
+        self.outputcontent4.label = 'Allerlei'
 
     def load_items(self):
 

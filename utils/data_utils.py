@@ -1,5 +1,8 @@
 
 def get_data_difference(list_backend, list_local):
+    '''
+        Get difference in backend and local data to proper updates
+    '''
     diff = []
     diff_rem_backend = []
     diff_added_backend = []
@@ -20,34 +23,24 @@ def get_data_difference(list_backend, list_local):
     return diff, diff_rem_backend, diff_added_backend
 
 def get_itemlist(myapp,tab):
-    # Return the itemlist for a specified tab
-    if tab == 'Lidl':
-        itemlist = myapp.rw.outputcontent1
-    elif tab == 'Aldi':
-        itemlist = myapp.rw.outputcontent2
-    elif tab == 'Carrefour':
-        itemlist = myapp.rw.outputcontent3 
-    elif tab == 'Allerlei':
-        itemlist = myapp.rw.outputcontent4 
-    else:
-        print('Error: tab not found')
-
-    return itemlist
+    ''' 
+        Return the itemlist for a specified tab
+    '''
+    for i in range(1, myapp.rw.number_of_tabs+1):
+        outputcontent = getattr(myapp.rw, f'outputcontent{i}')
+        if tab == outputcontent.label:
+            return outputcontent
+    return None
 
 def get_input(myapp, tab):
-    # Return the inputcontent for a specified tab
-    if tab == 'Lidl':
-        input = myapp.rw.inputcontent1
-    elif tab == 'Aldi':
-        input = myapp.rw.inputcontent2
-    elif tab == 'Carrefour':
-        input = myapp.rw.inputcontent3 
-    elif tab == 'Allerlei':
-        input = myapp.rw.inputcontent4 
-    else:
-        print('Error: tab not found')
-
-    return input    
+    '''
+      Return the inputcontent for a specified tab
+    '''
+    for i in range(1, myapp.rw.number_of_tabs+1):
+        outputcontent = getattr(myapp.rw, f'outputcontent{i}')
+        if tab == outputcontent.label:
+            return getattr(myapp.rw, f'inputcontent{i}')
+    return None    
 
 def convert_data(myapp, data):
     for item in data:
@@ -61,7 +54,6 @@ def convert_data_rem(myapp, data):
         itemlist.items.remove(item['name'])
 
 def update_outputcontent(myapp):
-    myapp.rw.outputcontent1.update()
-    myapp.rw.outputcontent2.update()
-    myapp.rw.outputcontent3.update()
-    myapp.rw.outputcontent4.update()
+    for i in range(1, myapp.rw.number_of_tabs+1):
+        outputcontent = getattr(myapp.rw, f'outputcontent{i}')
+        outputcontent.update()

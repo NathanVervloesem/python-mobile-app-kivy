@@ -7,7 +7,6 @@ def load_local():
     '''
         Load locally saved data
     '''
-
     with open(DATA_FILE_ITEMS, "r") as f:
         data = json.load(f)
         print('Loading local data')
@@ -32,35 +31,17 @@ def add_change_local(item_name, curr_tab, action):
 
 def save_local_all(myapp): 
     '''
-        Save all items to JSON file, inefficient because loop over all outputcontent list instead of checking for changes 
-        but fine for now
+        Save all items to JSON file.
+        Inefficient because loop over all outputcontent list instead of checking for changes 
+        but fine for now.
     '''
-    with open(DATA_FILE_ITEMS, "r") as f:
-        items = []
-        # for j in range(1, 4):
-        #     outputcontent = getattr(myapp.rw, f'outputcontent{i}')
-        for i in myapp.rw.outputcontent1.items:
+    items = []
+    for i in range(1, myapp.rw.number_of_tabs+1):
+        outputcontent = getattr(myapp.rw, f'outputcontent{i}')
+        for j in outputcontent.items:
             item = { 
-                'name': str(i),
-                'store': 'Lidl'
-            }                 
-            items.append(item)
-        for i in myapp.rw.outputcontent2.items:
-            item = { 
-                'name': str(i),
-                'store': 'Aldi'
-            }                 
-            items.append(item) 
-        for i in myapp.rw.outputcontent3.items:
-            item = { 
-                'name': str(i),
-                'store': 'Carrefour'
-            }                 
-            items.append(item)
-        for i in myapp.rw.outputcontent4.items:
-            item = { 
-                'name': str(i),
-                'store': 'Allerlei'
+                'name': str(j),
+                'store': outputcontent.label
             }                 
             items.append(item)
     with open(DATA_FILE_ITEMS, "w") as f:
