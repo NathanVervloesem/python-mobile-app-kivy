@@ -2,6 +2,14 @@
     orientation: 'horizontal'
     size_hint_y: None
     height: 20
+
+    Button:
+        size_hint: 0.20, 1
+        text: '+'
+        background_color: (0, 1, 0, 1)
+        on_press: root.on_multiple_button_click()
+        font_size: sp(32)
+
     Label:
         text: root.text
         font_size: sp(23)
@@ -9,7 +17,7 @@
         size_hint: 0.20, 1
         text: "x"
         background_color: (1, 0, 0, 1)
-        on_press: root.on_button_click()
+        on_press: root.on_remove_button_click()
         font_size: sp(32)
 
 
@@ -49,7 +57,7 @@
 
         Tabs:
             do_default_tab: False
-            tab_width : 150
+            tab_width : sp(150)
             
             TabbedPanelItem:
                 text: 'Lidl'
@@ -64,10 +72,10 @@
                 BoxLayout:
                     orientation:'vertical'
                     BoxLayout:
-                        size_hint: 1, 0.15
+                        size_hint: 1, 0.1
                         Button:
                             id: inputbutton1
-                            size_hint: 0.25, 1
+                            size_hint: 0.3, 1
                             text: 'add'
                             background_color: (0, 1, 0, 1)
                             on_press: root.add_item()
@@ -79,7 +87,7 @@
                             font_size: sp(23)
 
                         Button:
-                            size_hint: 0.4, 1
+                            size_hint: 0.8, 1
                             text: 'clear tab'
                             background_color: (1, 0, 0, 1)
                             on_press: root.clear_tab()
@@ -112,7 +120,7 @@
                         size_hint: 1, 0.1
                         Button:
                             id: inputbutton2
-                            size_hint: 0.25, 1
+                            size_hint: 0.3, 1
                             text: 'add'
                             background_color: (0, 1, 0, 1)
                             on_press: root.add_item()
@@ -124,7 +132,7 @@
                             font_size: sp(23)
 
                         Button:
-                            size_hint: 0.4, 1
+                            size_hint: 0.8, 1
                             text: 'clear tab'
                             background_color: (1, 0, 0, 1)
                             on_press: root.clear_tab()
@@ -159,7 +167,7 @@
                         size_hint: 1, 0.1
                         Button:
                             id: inputbutton3
-                            size_hint: 0.25, 1
+                            size_hint: 0.3, 1
                             text: 'add'
                             background_color: (0, 1, 0, 1)
                             on_press: root.add_item()
@@ -171,7 +179,7 @@
                             font_size: sp(23)
 
                         Button:
-                            size_hint: 0.4, 1
+                            size_hint: 0.8, 1
                             text: 'clear tab'
                             background_color: (1, 0, 0, 1)
                             on_press: root.clear_tab()
@@ -205,7 +213,7 @@
                         size_hint: 1, 0.1
                         Button:
                             id: inputbutton4
-                            size_hint: 0.25, 1
+                            size_hint: 0.3, 1
                             text: 'add'
                             background_color: (0, 1, 0, 1)
                             on_press: root.add_item()
@@ -217,7 +225,7 @@
                             font_size: sp(23)
 
                         Button:
-                            size_hint: 0.4, 1
+                            size_hint: 0.8, 1
                             text: 'clear tab'
                             background_color: (1, 0, 0, 1)
                             on_press: root.clear_tab()

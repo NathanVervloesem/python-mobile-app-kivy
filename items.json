@@ -4,15 +4,7 @@
     "store": "Lidl"
   },
   {
-    "name": "pizzadeeg",
-    "store": "Lidl"
-  },
-  {
     "name": "komkommer",
-    "store": "Lidl"
-  },
-  {
-    "name": "tomaten",
     "store": "Lidl"
   },
   {
@@ -32,19 +24,7 @@
     "store": "Lidl"
   },
   {
-    "name": "bollekes",
-    "store": "Lidl"
-  },
-  {
-    "name": "chocolade",
-    "store": "Lidl"
-  },
-  {
     "name": "beertjes",
-    "store": "Lidl"
-  },
-  {
-    "name": "m&m",
     "store": "Lidl"
   },
   {
@@ -58,5 +38,69 @@
   {
     "name": "boter",
     "store": "Lidl"
+  },
+  {
+    "name": "platte kaas",
+    "store": "Lidl"
+  },
+  {
+    "name": "tomaten",
+    "store": "Lidl"
+  },
+  {
+    "name": "yogurt",
+    "store": "Lidl"
+  },
+  {
+    "name": "eieren",
+    "store": "Lidl"
+  },
+  {
+    "name": "volle room in brik",
+    "store": "Lidl"
+  },
+  {
+    "name": "honing",
+    "store": "Lidl"
+  },
+  {
+    "name": "oploskoffie",
+    "store": "Lidl"
+  },
+  {
+    "name": "hummus",
+    "store": "Lidl"
+  },
+  {
+    "name": "mozarellobol 2x",
+    "store": "Lidl"
+  },
+  {
+    "name": "pizzadeeg 2x",
+    "store": "Lidl"
+  },
+  {
+    "name": "bladerdeeg 2x",
+    "store": "Lidl"
+  },
+  {
+    "name": "plestiekfolie 2x",
+    "store": "Lidl"
+  },
+  {
+    "name": "afwasmiddel3x",
+    "store": "Lidl"
+  },
+  {
+    "name": "wceend 2x",
+    "store": "Lidl"
+  },
+  {
+    "name": "test (9x)",
+    "store": "Aldi"
+  },
+  {
+    "name": "test (7x)",
+    "store": "Aldi"
   }
 ]
