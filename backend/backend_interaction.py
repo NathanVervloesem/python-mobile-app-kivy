@@ -85,33 +85,69 @@ def load_items(myapp):
         update_outputcontent(myapp)
 
 
+def replace_item_in_backend(myapp, curr_tab, item_name, new_name):
+    '''
+        Change item name in the backend
+    '''
+
+    if hasattr(myapp.rw.ids.connection_status, 'connected'):
+        if  myapp.rw.ids.connection_status.connected:
+            url = myapp.url + "items/replace"
+            data = {
+                "name": item_name,
+                "store": curr_tab,
+                "new_name": new_name
+            }                    
+            try:
+                print(f'Do_put_request data:{data}')
+                response = requests.put(url, json=data)
+                print("Server response:", response)
+                print("Server response.json():", response.json())
+            except Exception as e:
+                print("Error sending data:", e)
+            finally:
+                # Save changes locally
+                save_local_all(myapp)
+        else:
+            add_change_local(myapp, item_name,curr_tab,'replace',new_name)
+    else:
+        add_change_local(myapp, item_name,curr_tab,'replace',new_name)
+
+
 def remove_item_in_backend(myapp, curr_tab, item_name):
     '''
        Remove an item from the backend
     '''
-    if  myapp.rw.ids.connection_status.connected:
-        url = myapp.url + "items/remove"
-        data = {
-            "name": item_name,
-            "store": curr_tab
-        }
-        do_post_request(myapp, url, data)
+    if hasattr(myapp.rw.ids.connection_status, 'connected'):
+        if  myapp.rw.ids.connection_status.connected:
+            url = myapp.url + "items/remove"
+            data = {
+                "name": item_name,
+                "store": curr_tab
+            }
+            do_post_request(myapp, url, data)
+        else:
+            add_change_local(myapp, item_name,curr_tab,'remove')
     else:
         add_change_local(myapp, item_name,curr_tab,'remove')
+
 
 def add_to_backend(myapp, ct, item_name):
     '''
         Adding an item to the backend if possible
-    ''' 
-    if myapp.rw.ids.connection_status.connected:
-        url = myapp.url + "items/add"
-        data = { 
-            "name": str(item_name),
-            "store": ct
-        }
-        do_post_request(myapp, url, data)
+    '''
+    if hasattr(myapp.rw.ids.connection_status, 'connected'): 
+        if myapp.rw.ids.connection_status.connected:
+            url = myapp.url + "items/add"
+            data = { 
+                "name": str(item_name),
+                "store": ct
+            }
+            do_post_request(myapp, url, data)
+        else:
+            add_change_local(myapp, item_name, ct, 'add')
     else:
-        add_change_local(myapp, item_name, ct, 'add')
+        add_change_local(myapp, item_name, ct, 'add')       
 
 def clear_tab_backend(myapp, ct):
     '''
@@ -140,8 +176,10 @@ def deploy_changes(myapp,changes):
             add_to_backend(myapp, change['store'], change['name'])
         elif action == 'remove tab':
             clear_tab_backend(myapp, change['store'])
+        elif action == 'replace':
+            replace_item_in_backend(myapp, change['store'], change['name'], change['new_name'])
         else:
-            print('Action unknown')
+            print(f'Action {action} unknown')
 
 def deploy_changes_wrapper(myapp):
     '''

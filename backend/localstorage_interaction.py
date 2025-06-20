@@ -10,15 +10,23 @@ def load_local(myapp):
         print('Loading local data')
     return data
 
-def add_change_local(myapp, item_name, curr_tab, action):
+def add_change_local(myapp, item_name, curr_tab, action,new_name):
     ''' 
         Save a change to the local changes.json
     '''
-    data = { 
-        'name': str(item_name),
-        'store': curr_tab,
-        'action': action
-    }
+    if action == 'replace':
+        data = { 
+            'name': str(item_name),
+            'store': curr_tab,
+            'action': action,
+            'new_name': new_name
+        }
+    else:
+        data = { 
+            'name': str(item_name),
+            'store': curr_tab,
+            'action': action
+        }
     with open(myapp.path_changes, "r") as f:
         changes = json.load(f)
         changes.append(data)

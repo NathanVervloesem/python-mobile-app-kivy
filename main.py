@@ -10,7 +10,7 @@ from kivy.uix.tabbedpanel import TabbedPanel
 from kivy.utils import platform
 
 # Function from other files
-from backend.backend_interaction import add_to_backend, clear_tab_backend, deploy_changes_wrapper, load_items, remove_item_in_backend
+from backend.backend_interaction import add_to_backend, clear_tab_backend, deploy_changes_wrapper, load_items, remove_item_in_backend, replace_item_in_backend
 from utils.data_utils import get_input, get_itemlist
 
 
@@ -54,7 +54,10 @@ def check_file_existence(filename):
 class SelectableBox(RecycleDataViewBehavior, BoxLayout):
     text = StringProperty("")
 
-    def on_button_click(self):
+    def on_remove_button_click(self):
+        '''
+            Remove an item from the shopping list with x button
+        '''
         print('Current tab remove: ',myapp.curr_tab)
 
         itemlist = get_itemlist(myapp,myapp.curr_tab)      
@@ -67,6 +70,36 @@ class SelectableBox(RecycleDataViewBehavior, BoxLayout):
         # Communicate with backend to remove the item
         remove_item_in_backend(myapp,myapp.curr_tab,self.text)
 
+    def on_multiple_button_click(self):
+        '''
+            Increase the amount of an item by replace the name.
+            PROBLEM: the item is moved to the end of the list at load_items()
+        '''
+
+        print('Pushed + button')
+        itemlist = get_itemlist(myapp,myapp.curr_tab)
+
+        itemlist = get_itemlist(myapp,myapp.curr_tab)
+        target_index = itemlist.items.index(self.text)
+
+        # Analyze string
+        if self.text.endswith('x)'):
+            splitting_str = self.text.rsplit(' (')
+            print(f"String: {splitting_str}")
+
+            amount = splitting_str[1]
+            number = int(amount[0]) + 1
+            new_amount = '(' + str(number) + 'x)'
+
+            new_text = splitting_str[0] + ' ' + new_amount
+        else:
+            new_text = self.text + ' (2x)' 
+
+        itemlist.items[target_index] = new_text
+        itemlist.update()
+            
+        # Communicate with backend to replace the item
+        replace_item_in_backend(myapp,myapp.curr_tab,self.text, new_text)
 
 class Tabs(TabbedPanel):
     def __init__(self, **kwargs):
