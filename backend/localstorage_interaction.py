@@ -30,7 +30,7 @@ def add_change_local(myapp, item_name, curr_tab, action):
 def save_local_all(myapp): 
     '''
         Save all items to JSON file.
-        Inefficient because loop over all outputcontent list instead of checking for changes 
+        Inefficient in most cases because loops over all outputcontent list instead of checking for changes 
         but fine for now.
     '''
     items = []

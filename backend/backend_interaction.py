@@ -8,8 +8,10 @@ def do_post_request(myapp, url, data):
         Do post request and save locally
     '''
     try:
+        print(f'Do_post_request data:{data}')
         response = requests.post(url, json=data)
-        print("Server response:", response.json())
+        print("Server response:", response)
+        print("Server response.json():", response.json())
     except Exception as e:
         print("Error sending data:", e)
     finally:
@@ -31,12 +33,12 @@ def load_items(myapp):
     # Try to request data from backend
     try:
         response = requests.get(url)
-        print(response)
+        #print(f'Load items response: {response}')
 
         try:
             # Get the data from json
             data = response.json()
-            print(f'Data from response {data}')
+            #print(f'Data from response {data}') # for backend testing
 
             # If decoding error, load locally
             data_local = load_local(myapp)

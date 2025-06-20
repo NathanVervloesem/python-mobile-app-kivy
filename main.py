@@ -33,7 +33,7 @@ def check_file_existence(filename):
         with open(filename, "w") as f:
             json.dump([], f)
 
-# class FirstPage(BoxLayout):
+# class FirstPage(Button):
 #     def __init__(self):
 #         super().__init__()
 #         self.bind(on_press=self.switch)
@@ -42,7 +42,7 @@ def check_file_existence(filename):
 #         myapp.screen_manager.transition = SlideTransition(direction='left')
 #         myapp.screen_manager.current = 'Second'
 
-# class SecondPage(BoxLayout):
+# class SecondPage(Button):
 #     def __init__(self):
 #         super().__init__()
 #         self.bind(on_press=self.switch)
@@ -115,6 +115,16 @@ class RootWidget(BoxLayout):
         self.outputcontent2.label = 'Aldi'
         self.outputcontent3.label = 'Carrefour'
         self.outputcontent4.label = 'Allerlei'
+
+    def on_kv_post(self, base_widget):
+        myapp.rw = self
+        
+        # Define number of tabs and labels
+        myapp.rw.number_of_tabs = 4
+        myapp.rw.set_labels()
+
+        # Load items
+        load_items(myapp)
     
     def check_connection(self, dt):
         try:
@@ -143,15 +153,6 @@ class RootWidget(BoxLayout):
             # Load items
             load_items(myapp)
 
-    def on_kv_post(self, base_widget):
-        myapp.rw = self
-        
-        # Define number of tabs and labels
-        myapp.rw.number_of_tabs = 4
-        myapp.rw.set_labels()
-
-        # Load items
-        load_items(myapp)
 
     def add_item(self):
         '''
@@ -165,7 +166,7 @@ class RootWidget(BoxLayout):
             # Save item
             item = input.text
             # Get correct tab
-            print( itemlist.items)
+            print(f'add_item: Itemslist before append: {itemlist.items}')
             itemlist.items.append(item)
             itemlist.update()
             input.text = ""
@@ -191,7 +192,7 @@ class MyshoppingApp(App):
         super().__init__()
         self.curr_tab = 'Lidl'
         self.url = 'https://fastapi-shopping-1.onrender.com/'
-        #self.url = 'http://127.0.0.1:8080/'
+        #self.url = 'http://127.0.0.1:8080/'  # For local testing
 
     def build(self):
         # Initialize data files
@@ -199,8 +200,8 @@ class MyshoppingApp(App):
         self.path_items = get_item_file_path(DATA_FILE_ITEMS)
         self.path_changes = get_item_file_path(DATA_FILE_CHANGES)
 
-        print(self.path_items)
-        print(self.path_changes)
+        print(f'Path of item file: {self.path_items}')
+        print(f'Path of changes file: {self.path_changes}')
 
         # Ensure the file exists
         check_file_existence(self.path_items)
