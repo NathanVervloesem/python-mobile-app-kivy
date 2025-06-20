@@ -1,10 +1,62 @@
 [
   {
-    "name": "gras",
+    "name": "kaas",
+    "store": "Lidl"
+  },
+  {
+    "name": "pizzadeeg",
+    "store": "Lidl"
+  },
+  {
+    "name": "komkommer",
+    "store": "Lidl"
+  },
+  {
+    "name": "tomaten",
+    "store": "Lidl"
+  },
+  {
+    "name": "mayonaise",
+    "store": "Lidl"
+  },
+  {
+    "name": "tomatensaus 2x",
+    "store": "Lidl"
+  },
+  {
+    "name": "snoep ",
+    "store": "Lidl"
+  },
+  {
+    "name": "ships",
+    "store": "Lidl"
+  },
+  {
+    "name": "bollekes",
+    "store": "Lidl"
+  },
+  {
+    "name": "chocolade",
+    "store": "Lidl"
+  },
+  {
+    "name": "beertjes",
+    "store": "Lidl"
+  },
+  {
+    "name": "m&m",
+    "store": "Lidl"
+  },
+  {
+    "name": "noten ",
     "store": "Lidl"
   },
   {
     "name": "brood",
+    "store": "Lidl"
+  },
+  {
+    "name": "boter",
     "store": "Lidl"
   }
 ]

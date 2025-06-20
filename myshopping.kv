@@ -4,13 +4,13 @@
     height: 20
     Label:
         text: root.text
-        font_size: 23
+        font_size: sp(23)
     Button:
         size_hint: 0.20, 1
         text: "x"
         background_color: (1, 0, 0, 1)
         on_press: root.on_button_click()
-        font_size: 32
+        font_size: sp(32)
 
 
 
@@ -38,21 +38,22 @@
         Label:
             text: 'Shopping List'
             size_hint: 1, 0.1
-            font_size: 32
+            font_size: sp(32)
         
         Label:
             id: connection_status
             size_hint: 1, 0.06
             text: "Checking..."
             color: (1, 1, 0, 1)  # yellow for checking
-            font_size: 18
+            font_size: sp(20)
 
         Tabs:
             do_default_tab: False
+            tab_width : 150
             
             TabbedPanelItem:
                 text: 'Lidl'
-                font_size: 25
+                font_size: sp(25)
                 canvas.after:
                     Color:
                         rgba: (0.2, 0.6, 1, 0.2) if self.state == 'down' else (0.7, 0.7, 0.7, 0.2)
@@ -63,26 +64,26 @@
                 BoxLayout:
                     orientation:'vertical'
                     BoxLayout:
-                        size_hint: 1, 0.1
+                        size_hint: 1, 0.15
                         Button:
                             id: inputbutton1
                             size_hint: 0.25, 1
                             text: 'add'
                             background_color: (0, 1, 0, 1)
                             on_press: root.add_item()
-                            font_size: 23
+                            font_size: sp(23)
 
                         TextInput:
                             id: inputcontent1
                             multiline: False
-                            font_size: 23
+                            font_size: sp(23)
 
                         Button:
                             size_hint: 0.4, 1
                             text: 'clear tab'
                             background_color: (1, 0, 0, 1)
                             on_press: root.clear_tab()
-                            font_size: 25
+                            font_size: sp(25)
                 
                     ListWidget:
                         id: outputcontent1
@@ -90,7 +91,7 @@
                         orientation: 'vertical'
 
                         RecycleBoxLayout:
-                            default_size: None, dp(56)
+                            default_size: None, sp(50)
                             default_size_hint: 1, None
                             size_hint_y: None
                             height: self.minimum_height
@@ -98,7 +99,7 @@
 
             TabbedPanelItem:
                 text: 'Aldi'
-                font_size: 25
+                font_size: sp(25)
                 canvas.after:
                     Color:
                         rgba: (0.2, 0.6, 1, 0.2) if self.state == 'down' else (0.7, 0.7, 0.7, 0.2)
@@ -115,19 +116,19 @@
                             text: 'add'
                             background_color: (0, 1, 0, 1)
                             on_press: root.add_item()
-                            font_size: 23
+                            font_size: sp(23)
 
                         TextInput:
                             id: inputcontent2
                             multiline: False
-                            font_size: 23
+                            font_size: sp(23)
 
                         Button:
                             size_hint: 0.4, 1
                             text: 'clear tab'
                             background_color: (1, 0, 0, 1)
                             on_press: root.clear_tab()
-                            font_size: 25
+                            font_size: sp(25)
 
                     ListWidget:
                         id: outputcontent2
@@ -143,7 +144,8 @@
 
             TabbedPanelItem:
                 text: 'Carrefour'
-                font_size: 25
+                padding: 5
+                font_size: sp(25)
                 canvas.after:
                     Color:
                         rgba: (0.2, 0.6, 1, 0.2) if self.state == 'down' else (0.7, 0.7, 0.7, 0.2)
@@ -161,19 +163,19 @@
                             text: 'add'
                             background_color: (0, 1, 0, 1)
                             on_press: root.add_item()
-                            font_size: 23
+                            font_size: sp(23)
 
                         TextInput:
                             id: inputcontent3
                             multiline: False
-                            font_size: 23
+                            font_size: sp(23)
 
                         Button:
                             size_hint: 0.4, 1
                             text: 'clear tab'
                             background_color: (1, 0, 0, 1)
                             on_press: root.clear_tab()
-                            font_size: 25
+                            font_size: sp(25)
 
                     ListWidget:
                         id: outputcontent3
@@ -189,7 +191,7 @@
                             
             TabbedPanelItem:
                 text: 'Allerlei'
-                font_size: 25
+                font_size: sp(25)
                 canvas.after:
                     Color:
                         rgba: (0.2, 0.6, 1, 0.2) if self.state == 'down' else (0.7, 0.7, 0.7, 0.2)
@@ -207,19 +209,20 @@
                             text: 'add'
                             background_color: (0, 1, 0, 1)
                             on_press: root.add_item()
-                            font_size: 23
+                            font_size: sp(23)
 
                         TextInput:
                             id: inputcontent4
                             multiline: False
-                            font_size: 23
+                            font_size: sp(23)
 
                         Button:
                             size_hint: 0.4, 1
                             text: 'clear tab'
                             background_color: (1, 0, 0, 1)
                             on_press: root.clear_tab()
-                            font_size: 25
+                            font_size: sp(25)
+                            padding: 0
 
                     ListWidget:
                         id: outputcontent4
