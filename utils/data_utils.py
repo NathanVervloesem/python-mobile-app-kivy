@@ -61,3 +61,19 @@ def update_outputcontent(myapp):
     for i in range(1, myapp.rw.number_of_tabs+1):
         outputcontent = getattr(myapp.rw, f'outputcontent{i}')
         outputcontent.update()
+
+def increase_amount(text):
+    if text.endswith('x)'):
+        splitting_str = text.rsplit(' (')
+        print(f"String: {splitting_str}")
+
+        str_amount = splitting_str[1]
+        amount = str_amount.rsplit('x')
+        number = int(amount[0]) + 1
+        new_amount = '(' + str(number) + 'x)'
+
+        new_text = splitting_str[0] + ' ' + new_amount
+    else:
+        new_text = text + ' (2x)'
+        
+    return new_text

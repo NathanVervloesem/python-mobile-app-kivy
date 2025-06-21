@@ -11,7 +11,7 @@ from kivy.utils import platform
 
 # Function from other files
 from backend.backend_interaction import add_to_backend, clear_tab_backend, deploy_changes_wrapper, load_items, remove_item_in_backend, replace_item_in_backend
-from utils.data_utils import get_input, get_itemlist
+from utils.data_utils import get_input, get_itemlist, increase_amount
 
 
 # External imports
@@ -89,19 +89,8 @@ class SelectableBox(RecycleDataViewBehavior, BoxLayout):
         itemlist = get_itemlist(myapp,myapp.curr_tab)
         target_index = itemlist.items.index(self.text)
 
-        # Analyze string
-        if self.text.endswith('x)'):
-            splitting_str = self.text.rsplit(' (')
-            print(f"String: {splitting_str}")
-
-            amount = splitting_str[1]
-            number = int(amount[0]) + 1
-            new_amount = '(' + str(number) + 'x)'
-
-            new_text = splitting_str[0] + ' ' + new_amount
-        else:
-            new_text = self.text + ' (2x)' 
-
+        # Increase amount
+        new_text = increase_amount(self.text)
         itemlist.items[target_index] = new_text
         itemlist.update()
             
