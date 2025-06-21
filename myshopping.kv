@@ -1,3 +1,8 @@
+<MyScreenManager>
+    FirstScreen:
+    SecondScreen:
+
+
 <SelectableBox>:
     orientation: 'horizontal'
     size_hint_y: None
@@ -20,9 +25,8 @@
         on_press: root.on_remove_button_click()
         font_size: sp(32)
 
-
-
-<RootWidget>:
+<FirstScreen>:
+    name: "first"
     inputbutton1: inputbutton1
     inputcontent1: inputcontent1
     outputcontent1: outputcontent1    
@@ -241,6 +245,29 @@
                             size_hint_y: None
                             height: self.minimum_height
                             orientation: 'vertical'
+        Button:
+            size_hint: 1, 0.1 
+            text: "Go to Second Screen"
+            on_press: app.root.current = "second"
+            font_size: sp(23)
+
+
+<SecondScreen>:
+    name: "second"
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: "This is the SECOND screen"
+        Button:
+            size_hint: 1, 0.1
+            text: "Back to First Screen"
+            font_size: sp(23)
+            on_press: app.root.current = "first"    
+
+
+
+
+
 
    
 

@@ -1,106 +1,10 @@
 [
   {
-    "name": "kaas",
+    "name": "taart",
     "store": "Lidl"
   },
   {
-    "name": "komkommer",
+    "name": "brood (3x)",
     "store": "Lidl"
-  },
-  {
-    "name": "mayonaise",
-    "store": "Lidl"
-  },
-  {
-    "name": "tomatensaus 2x",
-    "store": "Lidl"
-  },
-  {
-    "name": "snoep ",
-    "store": "Lidl"
-  },
-  {
-    "name": "ships",
-    "store": "Lidl"
-  },
-  {
-    "name": "beertjes",
-    "store": "Lidl"
-  },
-  {
-    "name": "noten ",
-    "store": "Lidl"
-  },
-  {
-    "name": "brood",
-    "store": "Lidl"
-  },
-  {
-    "name": "boter",
-    "store": "Lidl"
-  },
-  {
-    "name": "platte kaas",
-    "store": "Lidl"
-  },
-  {
-    "name": "tomaten",
-    "store": "Lidl"
-  },
-  {
-    "name": "yogurt",
-    "store": "Lidl"
-  },
-  {
-    "name": "eieren",
-    "store": "Lidl"
-  },
-  {
-    "name": "volle room in brik",
-    "store": "Lidl"
-  },
-  {
-    "name": "honing",
-    "store": "Lidl"
-  },
-  {
-    "name": "oploskoffie",
-    "store": "Lidl"
-  },
-  {
-    "name": "hummus",
-    "store": "Lidl"
-  },
-  {
-    "name": "mozarellobol 2x",
-    "store": "Lidl"
-  },
-  {
-    "name": "pizzadeeg 2x",
-    "store": "Lidl"
-  },
-  {
-    "name": "bladerdeeg 2x",
-    "store": "Lidl"
-  },
-  {
-    "name": "plestiekfolie 2x",
-    "store": "Lidl"
-  },
-  {
-    "name": "afwasmiddel3x",
-    "store": "Lidl"
-  },
-  {
-    "name": "wceend 2x",
-    "store": "Lidl"
-  },
-  {
-    "name": "test (9x)",
-    "store": "Aldi"
-  },
-  {
-    "name": "test (7x)",
-    "store": "Aldi"
   }
 ]

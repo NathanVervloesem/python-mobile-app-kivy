@@ -36,10 +36,14 @@ def get_input(myapp, tab):
     '''
       Return the inputcontent for a specified tab
     '''
+    print(f'Tab: {tab}')
     for i in range(1, myapp.rw.number_of_tabs+1):
         outputcontent = getattr(myapp.rw, f'outputcontent{i}')
+        print(f'Test label: {outputcontent.label}')
         if tab == outputcontent.label:
+            print(f'Test succeeded for {tab}')
             return getattr(myapp.rw, f'inputcontent{i}')
+    print('Return none')
     return None    
 
 def convert_data(myapp, data):

@@ -21,6 +21,7 @@ import requests
 
 DATA_FILE_ITEMS = 'items.json'
 DATA_FILE_CHANGES = 'changes.json'
+tab_labels = ['Lidl', 'Aldi', 'Carrefour', 'Moemoe']
 
 def get_item_file_path(filename):
     if platform == 'android':
@@ -50,6 +51,12 @@ def check_file_existence(filename):
 #     def switch(self,item):
 #         myapp.screen_manager.transition = SlideTransition(direction='right')
 #         myapp.screen_manager.current = 'First'
+class MyScreenManager(ScreenManager):
+    pass
+
+class SecondScreen(Screen):
+    pass
+
 
 class SelectableBox(RecycleDataViewBehavior, BoxLayout):
     text = StringProperty("")
@@ -106,10 +113,14 @@ class Tabs(TabbedPanel):
         super().__init__(**kwargs)
 
     def on_current_tab(self, instance, value):
-         self.curr_tab = value.text
-         print("Current tab label:", value.text)
-         myapp.curr_tab = value.text
-         return value.text
+        self.curr_tab = value.text
+        if not value.text:
+            print('check')
+            value.text = tab_labels[0]
+        print
+        print("Current tab label:", value.text)
+        myapp.curr_tab = value.text
+        return value.text
 
 class ListWidget(RecycleView):
 
@@ -121,7 +132,7 @@ class ListWidget(RecycleView):
         self.items = []
         self.label = ''
 
-class RootWidget(BoxLayout):
+class FirstScreen(Screen):
     inputbutton1 = ObjectProperty(None)
     inputcontent1 = ObjectProperty(None)
     outputcontent1 = ObjectProperty(None)
@@ -143,21 +154,20 @@ class RootWidget(BoxLayout):
         super().__init__(**kwargs)
         Clock.schedule_interval(self.check_connection, 5)  # every 5 seconds
 
-    def set_labels(self):
-        self.outputcontent1.label = 'Lidl'
-        self.outputcontent2.label = 'Aldi'
-        self.outputcontent3.label = 'Carrefour'
-        self.outputcontent4.label = 'Moemoe'
-
     def on_kv_post(self, base_widget):
         myapp.rw = self
         
         # Define number of tabs and labels
-        myapp.rw.number_of_tabs = 4
-        myapp.rw.set_labels()
+        myapp.rw.number_of_tabs = len(tab_labels)
+        myapp.rw.set_labels(tab_labels)
 
         # Load items
         load_items(myapp)
+
+    def set_labels(self, tab_labels):
+        for i in range(1,myapp.rw.number_of_tabs+1):
+            outputcontent = getattr(myapp.rw, f'outputcontent{i}')
+            outputcontent.label = tab_labels[i-1]
     
     def check_connection(self, dt):
         try:
@@ -223,9 +233,9 @@ class RootWidget(BoxLayout):
 class MyshoppingApp(App):
     def __init__(self):
         super().__init__()
-        self.curr_tab = 'Lidl'
         self.url = 'https://fastapi-shopping-1.onrender.com/'
         #self.url = 'http://127.0.0.1:8080/'  # For local testing
+        self.screen_manager = ScreenManager()
 
     def build(self):
         # Initialize data files
@@ -240,23 +250,17 @@ class MyshoppingApp(App):
         check_file_existence(self.path_items)
         check_file_existence(self.path_changes)
 
-        # Initialize Rootwidget
-        rw = RootWidget()
-
         # Initialize tabs
         tp = Tabs()
         tp.bind(current_tab=tp.on_current_tab)
         self.tp = tp
         self.curr_tab = tp.current_tab
-        self.curr_tab = 'Lidl'
 
         # Initialize selectable box
         sb = SelectableBox()
         self.sb = sb
 
-
-
-        return rw
+        return MyScreenManager()
     
 myapp = MyshoppingApp()
 #myapp.build()
