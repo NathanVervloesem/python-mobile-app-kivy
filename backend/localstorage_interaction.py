@@ -55,6 +55,22 @@ def save_local_all(myapp):
         print('Saved to local file')
 
 
+def load_local_cart(myapp):
+    '''
+        Load locally saved data
+    '''
+    with open(myapp.path_cart, "r") as f:
+        data = json.load(f)
+        print('Loading local cart data')
+
+    # Convert
+    itemlist = myapp.second_screen.outputcontent
+    for item in data:
+        itemlist.items.append(item['name'])
+    
+    itemlist.update()
+
+
 def add_to_local_cart(myapp,item_name):
     data = {
         'name': item_name
