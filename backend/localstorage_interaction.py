@@ -10,7 +10,7 @@ def load_local(myapp):
         print('Loading local data')
     return data
 
-def add_change_local(myapp, item_name, curr_tab, action,new_name):
+def add_change_local(myapp, item_name, curr_tab, action,new_name=None):
     ''' 
         Save a change to the local changes.json
     '''
