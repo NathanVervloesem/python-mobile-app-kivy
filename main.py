@@ -147,7 +147,7 @@ class RootWidget(BoxLayout):
         self.outputcontent1.label = 'Lidl'
         self.outputcontent2.label = 'Aldi'
         self.outputcontent3.label = 'Carrefour'
-        self.outputcontent4.label = 'Allerlei'
+        self.outputcontent4.label = 'Moemoe'
 
     def on_kv_post(self, base_widget):
         myapp.rw = self
