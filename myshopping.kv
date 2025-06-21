@@ -24,6 +24,17 @@
         background_color: (1, 0, 0, 1)
         on_press: root.on_remove_button_click()
         font_size: sp(32)
+    Button
+        size_hint: 0.20, 1
+        text: "cart"
+        background_color: (0, 0, 1, 1)
+        on_press: root.on_cart_button_click()
+        font_size: sp(23)
+
+<SelectableBoxSecondScreen>
+    Label:
+        text: root.text
+        font_size: sp(23)
 
 <FirstScreen>:
     name: "first"
@@ -245,24 +256,61 @@
                             size_hint_y: None
                             height: self.minimum_height
                             orientation: 'vertical'
-        Button:
+        BoxLayout:
             size_hint: 1, 0.1 
-            text: "Go to Second Screen"
-            on_press: app.root.current = "second"
-            font_size: sp(23)
+            Button:
+                size_hint: 0.5, 1
+                text: "Shopping List"
+                font_size: sp(23)
+            Button:
+                size_hint: 0.5, 1
+                text: "Cart List"   
+                font_size: sp(23)
+                on_press: 
+                    app.root.current = "second"
+                    app.root.transition.direction = 'left'
 
 
 <SecondScreen>:
     name: "second"
+    outputcontent:outputcontent
     BoxLayout:
         orientation: 'vertical'
         Label:
-            text: "This is the SECOND screen"
-        Button:
+            text: 'Cart List'
             size_hint: 1, 0.1
-            text: "Back to First Screen"
+            font_size: sp(32)
+        Button:
+            text: 'clear cart'
+            size_hint: 1, 0.1
+            background_color: (1, 0, 0, 1)
             font_size: sp(23)
-            on_press: app.root.current = "first"    
+
+        ListWidget:
+            id: outputcontent
+            viewclass: 'SelectableBoxSecondScreen'
+            orientation: 'vertical'
+
+            RecycleBoxLayout:
+                default_size: None, sp(50)
+                default_size_hint: 1, None
+                size_hint_y: None
+                height: self.minimum_height
+                orientation: 'vertical'
+        BoxLayout:
+            size_hint: 1, 0.1
+            Button:
+                size_hint: 0.5, 1
+                text: "Shopping List"
+                font_size: sp(23)
+                on_press: 
+                    app.root.current = "first" 
+                    app.root.transition.direction = 'right'   
+            Button:
+                size_hint: 0.5, 1
+                text: "Cart List"
+                font_size: sp(23)             
+        
 
 
 

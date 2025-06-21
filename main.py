@@ -11,6 +11,7 @@ from kivy.utils import platform
 
 # Function from other files
 from backend.backend_interaction import add_to_backend, clear_tab_backend, deploy_changes_wrapper, load_items, remove_item_in_backend, replace_item_in_backend
+from backend.localstorage_interaction import add_to_local_cart
 from utils.data_utils import get_input, get_itemlist, increase_amount
 
 
@@ -21,6 +22,7 @@ import requests
 
 DATA_FILE_ITEMS = 'items.json'
 DATA_FILE_CHANGES = 'changes.json'
+DATA_FILE_CART = 'cart.json'
 tab_labels = ['Lidl', 'Aldi', 'Carrefour', 'Moemoe']
 
 def get_item_file_path(filename):
@@ -34,27 +36,7 @@ def check_file_existence(filename):
         with open(filename, "w") as f:
             json.dump([], f)
 
-# class FirstPage(Button):
-#     def __init__(self):
-#         super().__init__()
-#         self.bind(on_press=self.switch)
-
-#     def switch(self,item):
-#         myapp.screen_manager.transition = SlideTransition(direction='left')
-#         myapp.screen_manager.current = 'Second'
-
-# class SecondPage(Button):
-#     def __init__(self):
-#         super().__init__()
-#         self.bind(on_press=self.switch)
-
-#     def switch(self,item):
-#         myapp.screen_manager.transition = SlideTransition(direction='right')
-#         myapp.screen_manager.current = 'First'
 class MyScreenManager(ScreenManager):
-    pass
-
-class SecondScreen(Screen):
     pass
 
 
@@ -96,6 +78,24 @@ class SelectableBox(RecycleDataViewBehavior, BoxLayout):
             
         # Communicate with backend to replace the item
         replace_item_in_backend(myapp,myapp.curr_tab,self.text, new_text)
+
+    def on_cart_button_click(self):
+        # Remove from shopping list
+        self.on_remove_button_click()
+
+        # Add in cart list
+        text = self.text + ' (' + myapp.curr_tab + ')'
+        itemlist = myapp.second_screen.outputcontent
+        itemlist.items.append(text)
+        itemlist.update()
+
+        # Add to cart (cart.json) #TODO
+        add_to_local_cart(myapp,text)
+
+
+
+class SelectableBoxSecondScreen(RecycleDataViewBehavior, BoxLayout):
+    text = StringProperty("")
 
 class Tabs(TabbedPanel):
     def __init__(self, **kwargs):
@@ -203,7 +203,7 @@ class FirstScreen(Screen):
             itemlist.update()
             input.text = ""
 
-            # and send it to the backend
+            # Send item to the backend
             add_to_backend(myapp,myapp.curr_tab,item)
     
     def clear_tab(self):
@@ -219,6 +219,13 @@ class FirstScreen(Screen):
         # Send this to backend
         clear_tab_backend(myapp, myapp.curr_tab)   
 
+
+class SecondScreen(Screen):
+    outputcontent = ObjectProperty(None)
+
+    def on_kv_post(self, base_widget):
+        myapp.second_screen = self
+
 class MyshoppingApp(App):
     def __init__(self):
         super().__init__()
@@ -231,13 +238,16 @@ class MyshoppingApp(App):
         # Path for Android application
         self.path_items = get_item_file_path(DATA_FILE_ITEMS)
         self.path_changes = get_item_file_path(DATA_FILE_CHANGES)
+        self.path_cart = get_item_file_path(DATA_FILE_CART)
 
         print(f'Path of item file: {self.path_items}')
         print(f'Path of changes file: {self.path_changes}')
+        print(f'Path of changes file: {self.path_cart}')
 
         # Ensure the file exists
         check_file_existence(self.path_items)
         check_file_existence(self.path_changes)
+        check_file_existence(self.path_cart)
 
         # Initialize tabs
         tp = Tabs()
@@ -249,7 +259,10 @@ class MyshoppingApp(App):
         sb = SelectableBox()
         self.sb = sb
 
-        return MyScreenManager()
+        # Screenmanage
+        sm = MyScreenManager(transition=SlideTransition(duration=0.3))
+
+        return sm
     
 myapp = MyshoppingApp()
 #myapp.build()

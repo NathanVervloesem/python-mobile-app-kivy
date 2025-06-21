@@ -55,3 +55,13 @@ def save_local_all(myapp):
         print('Saved to local file')
 
 
+def add_to_local_cart(myapp,item_name):
+    data = {
+        'name': item_name
+        }
+    with open(myapp.path_cart,"r") as f: 
+        items = json.load(f)        
+        items.append(data)
+    with open(myapp.path_cart, "w") as f:
+        json.dump(items, f, indent=2)
+        print('Saved to cart file')   
