@@ -11,7 +11,7 @@ from kivy.utils import platform
 
 # Function from other files
 from backend.backend_interaction import add_to_backend, clear_tab_backend, deploy_changes_wrapper, load_items, remove_item_in_backend, replace_item_in_backend
-from backend.localstorage_interaction import add_to_local_cart, load_local_cart
+from backend.localstorage_interaction import add_to_local_cart, load_local_cart, clear_local_cart
 from utils.data_utils import get_input, get_itemlist, increase_amount
 
 
@@ -228,6 +228,15 @@ class SecondScreen(Screen):
         
         # Load cart items from local storage
         load_local_cart(myapp)
+
+    def on_clear_cart_click(self):
+        # Remove on screen
+        itemlist = myapp.second_screen.outputcontent
+        itemlist.items = [] 
+        itemlist.update()  
+
+        # Remove out local storage
+        clear_local_cart(myapp)
 
 
 class MyshoppingApp(App):

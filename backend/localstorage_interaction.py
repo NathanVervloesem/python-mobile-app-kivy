@@ -80,4 +80,9 @@ def add_to_local_cart(myapp,item_name):
         items.append(data)
     with open(myapp.path_cart, "w") as f:
         json.dump(items, f, indent=2)
-        print('Saved to cart file')   
+        print('Saved to cart file')  
+
+def clear_local_cart(myapp):
+    with open(myapp.path_cart, "w") as f:
+        json.dump([], f)
+        print('Clear cart')    
