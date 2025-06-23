@@ -19,18 +19,39 @@ from utils.data_utils import get_input, get_itemlist, increase_amount
 
 
 # External imports
+import ast
 from datetime import datetime
+from dotenv import load_dotenv
+import google.generativeai as genai
 import json
 import os
 from pathlib import Path
+from PIL import Image
 import requests
 import shutil
 
+# Define tab labels
+tab_labels = ['Lidl', 'Aldi', 'Carrefour', 'Moemoe']
+
+# Define local file names
 DATA_FILE_ITEMS = 'items.json'
 DATA_FILE_CHANGES = 'changes.json'
 DATA_FILE_CART = 'cart.json'
-tab_labels = ['Lidl', 'Aldi', 'Carrefour', 'Moemoe']
+DATA_FILE_EXPENSES = 'expenses.json'
+
 ORIGINAL_CWD = Path().absolute()
+
+# Load environment variables
+load_dotenv()
+GOOGLE_API_KEY = os.getenv("API_KEY")
+
+if not GOOGLE_API_KEY:
+    print("Error: Google API key not found.   Please set the GOOGLE_API_KEY environment variable.")
+    exit()
+
+genai.configure(api_key=GOOGLE_API_KEY)
+
+
 
 def get_item_file_path(filename):
     if platform == 'android':
@@ -42,6 +63,8 @@ def check_file_existence(filename):
     if not os.path.exists(filename):
         with open(filename, "w") as f:
             json.dump([], f)
+
+
 
 class MyScreenManager(ScreenManager):
     pass
@@ -246,7 +269,13 @@ class SecondScreen(Screen):
         clear_local_cart(myapp)
 
 class ThirdScreen(Screen):
-    pass
+    expensescontent = ObjectProperty(None)
+
+
+    def on_kv_post(self, base_widget):
+        myapp.thrid_screen = self
+        
+        # Load expenses   # use insert to put the newest items in front
 
 class FourthScreen(Screen):
     def select_file(self, *args):
@@ -285,7 +314,8 @@ class FourthScreen(Screen):
             self.img.source = new_path
             self.img.reload()
 
-    def analyze_photo(self):  # TODO
+    def analyze_photo(self):  # TODO  
+        # Here the code with the AI agent
         pass
 
 class MyshoppingApp(App):
@@ -301,15 +331,18 @@ class MyshoppingApp(App):
         self.path_items = get_item_file_path(DATA_FILE_ITEMS)
         self.path_changes = get_item_file_path(DATA_FILE_CHANGES)
         self.path_cart = get_item_file_path(DATA_FILE_CART)
+        self.path_expenses = get_item_file_path(DATA_FILE_EXPENSES)
 
         print(f'Path of item file: {self.path_items}')
         print(f'Path of changes file: {self.path_changes}')
         print(f'Path of changes file: {self.path_cart}')
+        print(f'Path of expenses file: {self.path_expenses}')
 
         # Ensure the file exists
         check_file_existence(self.path_items)
         check_file_existence(self.path_changes)
         check_file_existence(self.path_cart)
+        check_file_existence(self.path_expenses)
 
         # Initialize tabs
         tp = Tabs()
@@ -321,7 +354,7 @@ class MyshoppingApp(App):
         sb = SelectableBox()
         self.sb = sb
 
-        # Screenmanage
+        # Screenmanager
         sm = MyScreenManager(transition=SlideTransition(duration=0.3))
 
         return sm
