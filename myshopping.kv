@@ -330,10 +330,11 @@
 
 <ThirdScreen>
     name: 'third'
+    expensescontent:expensescontent
     BoxLayout:
         orientation: 'vertical'
         Label: 
-            text: 'Third Screen'
+            text: 'Expenses Screen'
             size_hint: 1, 0.1
             font_size: sp(32) 
         Button:
@@ -343,7 +344,19 @@
             background_color: (0, 1, 0, 1)
             on_press:
                 app.root.current = 'fourth'
+        ListWidget:
+            id: expensescontent
+            viewclass: 'SelectableBoxSecondScreen'
+            orientation: 'vertical'
+
+            RecycleBoxLayout:
+                default_size: None, sp(50)
+                default_size_hint: 1, None
+                size_hint_y: None
+                height: self.minimum_height
+                orientation: 'vertical'
         BoxLayout:
+            size_hint: 1, 0.1
             Button:
                 size_hint: 0.5, 1
                 text: "Shopping List"
