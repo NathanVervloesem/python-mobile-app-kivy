@@ -1,6 +1,8 @@
 <MyScreenManager>
     FirstScreen:
     SecondScreen:
+    ThirdScreen:
+    FourthScreen:
 
 
 <SelectableBox>:
@@ -269,6 +271,13 @@
                 on_press: 
                     app.root.current = "second"
                     app.root.transition.direction = 'left'
+            Button:
+                size_hint: 0.5, 1
+                text: "Third Page"
+                font_size: sp(23)   
+                on_press:
+                    app.root.current = "third"
+                    app.root.transition.direction = 'left'
 
 
 <SecondScreen>:
@@ -310,7 +319,70 @@
             Button:
                 size_hint: 0.5, 1
                 text: "Cart List"
-                font_size: sp(23)             
+                font_size: sp(23)  
+            Button:
+                size_hint: 0.5, 1
+                text: "Third Page"
+                font_size: sp(23)
+                on_press:
+                    app.root.current = "third"
+                    app.root.transition.direction = 'left'
+
+<ThirdScreen>
+    name: 'third'
+    BoxLayout:
+        orientation: 'vertical'
+        Label: 
+            text: 'Third Screen'
+            size_hint: 1, 0.1
+            font_size: sp(32) 
+        Button:
+            size_hint: 1, 0.1
+            font_size: sp(23)
+            text: 'Add expense'
+            background_color: (0, 1, 0, 1)
+            on_press:
+                app.root.current = 'fourth'
+        BoxLayout:
+            Button:
+                size_hint: 0.5, 1
+                text: "Shopping List"
+                font_size: sp(23)                
+                on_press: 
+                    app.root.current = "first" 
+                    app.root.transition.direction = 'right'   
+            Button:
+                size_hint: 0.5, 1
+                text: "Cart List"
+                font_size: sp(23)
+                on_press: 
+                    app.root.current = "second" 
+                    app.root.transition.direction = 'right'                
+            Button:
+                size_hint: 0.5, 1
+                text: "Third Page"
+                font_size: sp(23)
+
+<FourthScreen>:
+    name: "fourth" 
+    img: img  
+    BoxLayout:
+        orientation: 'vertical' 
+        Button:
+            text: 'Choose Image'
+            size_hint_y: None
+            height: '48sp'
+            font_size: sp(32)
+            on_release: root.select_file()
+        Image:
+            id: img
+            source: ''
+        Button:
+            text: 'Analyze and add'
+            size_hint: 1, 0.1 
+            font_size: sp(32)
+            on_release: root.analyze_photo()                   
+
         
 
 

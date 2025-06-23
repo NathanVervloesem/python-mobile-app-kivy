@@ -3,11 +3,14 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.properties import ObjectProperty, StringProperty
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.image import Image
 from kivy.uix.recycleview import RecycleView
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
 from kivy.uix.tabbedpanel import TabbedPanel
 from kivy.utils import platform
+from plyer import filechooser
+
 
 # Function from other files
 from backend.backend_interaction import add_to_backend, clear_tab_backend, deploy_changes_wrapper, load_items, remove_item_in_backend, replace_item_in_backend
@@ -16,14 +19,18 @@ from utils.data_utils import get_input, get_itemlist, increase_amount
 
 
 # External imports
+from datetime import datetime
 import json
 import os
+from pathlib import Path
 import requests
+import shutil
 
 DATA_FILE_ITEMS = 'items.json'
 DATA_FILE_CHANGES = 'changes.json'
 DATA_FILE_CART = 'cart.json'
 tab_labels = ['Lidl', 'Aldi', 'Carrefour', 'Moemoe']
+ORIGINAL_CWD = Path().absolute()
 
 def get_item_file_path(filename):
     if platform == 'android':
@@ -238,6 +245,48 @@ class SecondScreen(Screen):
         # Remove out local storage
         clear_local_cart(myapp)
 
+class ThirdScreen(Screen):
+    pass
+
+class FourthScreen(Screen):
+    def select_file(self, *args):
+        filechooser.open_file(
+            title="Pick an Image",
+            filters=[("Image files", "*.jpg;*.jpeg;*.png")],
+            on_selection=self.file_selected
+        )
+
+    def file_selected(self, selection):
+        # Restore original working dir
+        os.chdir(ORIGINAL_CWD)
+
+        if selection:
+            original_path = selection[0]
+            app = App.get_running_app()
+
+            # Create a photos directory inside app's private storage
+            if platform == 'android':
+                save_dir = os.path.join(app.user_data_dir, "photos")
+            else:
+                save_dir = "photos"
+
+            os.makedirs(save_dir, exist_ok=True)
+
+            # Unique filename (timestamp-based)
+            ext = os.path.splitext(original_path)[1]
+            filename = f"photo_{datetime.now().strftime('%Y%m%d_%H%M%S')}{ext}"
+            new_path = os.path.join(save_dir, filename)
+
+            # Copy file
+            shutil.copy(original_path, new_path)
+
+            print(f"Copied image to: {new_path}")
+
+            self.img.source = new_path
+            self.img.reload()
+
+    def analyze_photo(self):  # TODO
+        pass
 
 class MyshoppingApp(App):
     def __init__(self):
