@@ -262,18 +262,18 @@
             size_hint: 1, 0.1 
             Button:
                 size_hint: 0.5, 1
-                text: "Shopping List"
+                text: "Shopping"
                 font_size: sp(23)
             Button:
                 size_hint: 0.5, 1
-                text: "Cart List"   
+                text: "Cart"   
                 font_size: sp(23)
                 on_press: 
                     app.root.current = "second"
                     app.root.transition.direction = 'left'
             Button:
                 size_hint: 0.5, 1
-                text: "Third Page"
+                text: "Expenses"
                 font_size: sp(23)   
                 on_press:
                     app.root.current = "third"
@@ -311,18 +311,18 @@
             size_hint: 1, 0.1
             Button:
                 size_hint: 0.5, 1
-                text: "Shopping List"
+                text: "Shopping"
                 font_size: sp(23)
                 on_press: 
                     app.root.current = "first" 
                     app.root.transition.direction = 'right'   
             Button:
                 size_hint: 0.5, 1
-                text: "Cart List"
+                text: "Cart"
                 font_size: sp(23)  
             Button:
                 size_hint: 0.5, 1
-                text: "Third Page"
+                text: "Expenses"
                 font_size: sp(23)
                 on_press:
                     app.root.current = "third"
@@ -359,21 +359,21 @@
             size_hint: 1, 0.1
             Button:
                 size_hint: 0.5, 1
-                text: "Shopping List"
+                text: "Shopping"
                 font_size: sp(23)                
                 on_press: 
                     app.root.current = "first" 
                     app.root.transition.direction = 'right'   
             Button:
                 size_hint: 0.5, 1
-                text: "Cart List"
+                text: "Cart"
                 font_size: sp(23)
                 on_press: 
                     app.root.current = "second" 
                     app.root.transition.direction = 'right'                
             Button:
                 size_hint: 0.5, 1
-                text: "Third Page"
+                text: "Expenses"
                 font_size: sp(23)
 
 <FourthScreen>:
@@ -394,7 +394,11 @@
             text: 'Analyze and add'
             size_hint: 1, 0.1 
             font_size: sp(32)
-            on_release: root.analyze_photo()                   
+            on_release: 
+                app.root.current = "third" 
+                app.root.transition.direction = 'left'      
+                root.analyze_photo()  
+                     
 
         
 

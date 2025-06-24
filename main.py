@@ -14,12 +14,12 @@ from plyer import filechooser
 
 # Function from other files
 from backend.backend_interaction import add_to_backend, clear_tab_backend, deploy_changes_wrapper, load_items, remove_item_in_backend, replace_item_in_backend
-from backend.localstorage_interaction import add_to_local_cart, load_local_cart, clear_local_cart
-from utils.data_utils import get_input, get_itemlist, increase_amount
+from backend.localstorage_interaction import add_to_local_cart, load_local_cart, clear_local_cart, save_receipt_data, load_local_expenses
+from utils.data_utils import get_input, get_itemlist, increase_amount, convert_expenses_data
+from utils.ai_utils import analyze_receipt_image, get_receipt_data
 
 
 # External imports
-import ast
 from datetime import datetime
 from dotenv import load_dotenv
 import google.generativeai as genai
@@ -273,11 +273,16 @@ class ThirdScreen(Screen):
 
 
     def on_kv_post(self, base_widget):
-        myapp.thrid_screen = self
+        myapp.third_screen = self
         
         # Load expenses   # use insert to put the newest items in front
+        load_local_expenses(myapp)
 
 class FourthScreen(Screen):
+    def on_kv_post(self, base_widget):
+        myapp.fourth_screen = self
+
+
     def select_file(self, *args):
         filechooser.open_file(
             title="Pick an Image",
@@ -315,8 +320,21 @@ class FourthScreen(Screen):
             self.img.reload()
 
     def analyze_photo(self):  # TODO  
-        # Here the code with the AI agent
-        pass
+        # Here the code with the LLM
+        analysis_result = analyze_receipt_image(self.img.source)
+
+        # Organise in data
+        data = get_receipt_data(analysis_result)
+
+        # Render on expenses screen
+        data_string = convert_expenses_data(data)
+
+        exp = myapp.third_screen.expensescontent
+        exp.items.append(data_string)
+        exp.update()
+
+        # Save in local expenses file
+        save_receipt_data(myapp, data)
 
 class MyshoppingApp(App):
     def __init__(self):

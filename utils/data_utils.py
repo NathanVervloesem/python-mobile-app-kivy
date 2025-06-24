@@ -77,3 +77,7 @@ def increase_amount(text):
         new_text = text + ' (2x)'
         
     return new_text
+
+
+def convert_expenses_data(data):
+    return f'{data["merchant_name"]} {data["total_amount"]}euro {data["date_of_purchase"]}'

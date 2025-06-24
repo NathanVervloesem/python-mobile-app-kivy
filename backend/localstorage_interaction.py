@@ -1,4 +1,5 @@
 import json
+from utils.data_utils import convert_expenses_data
 
 
 def load_local(myapp):
@@ -85,4 +86,30 @@ def add_to_local_cart(myapp,item_name):
 def clear_local_cart(myapp):
     with open(myapp.path_cart, "w") as f:
         json.dump([], f)
-        print('Clear cart')    
+        print('Clear cart')   
+
+
+
+def save_receipt_data(myapp, data):
+    with open(myapp.path_expenses,"r") as f:
+        expenses = json.load(f)
+        expenses.append(data)
+    with open(myapp.path_expenses, "w") as f:
+        json.dump(expenses, f, indent=2)
+        print('Saved expenses to local file')
+
+
+def load_local_expenses(myapp):
+    '''
+    Load local expenses from expenses file
+    '''
+    with open(myapp.path_expenses, "r") as f:
+        data = json.load(f)
+        print('Loading local cart data')
+
+    # Convert
+    itemlist = myapp.third_screen.expensescontent
+    for item in data:
+        itemlist.items.append(convert_expenses_data(item))
+    
+    itemlist.update()
