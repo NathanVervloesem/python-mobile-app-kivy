@@ -80,4 +80,4 @@ def increase_amount(text):
 
 
 def convert_expenses_data(data):
-    return f'{data["merchant_name"]} {data["total_amount"]}euro {data["date_of_purchase"]}'
+    return f'{data["id"]}. {data["merchant_name"]} {data["date_of_purchase"]} {data["total_amount"]}euro'

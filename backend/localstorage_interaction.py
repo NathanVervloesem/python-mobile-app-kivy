@@ -89,10 +89,11 @@ def clear_local_cart(myapp):
         print('Clear cart')   
 
 
-
 def save_receipt_data(myapp, data):
     with open(myapp.path_expenses,"r") as f:
         expenses = json.load(f)
+        id = len(expenses) + 1
+        data['id'] = id
         expenses.append(data)
     with open(myapp.path_expenses, "w") as f:
         json.dump(expenses, f, indent=2)

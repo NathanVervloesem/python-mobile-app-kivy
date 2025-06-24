@@ -3,6 +3,7 @@
     SecondScreen:
     ThirdScreen:
     FourthScreen:
+    FifthScreen:
 
 
 <SelectableBox>:
@@ -37,6 +38,30 @@
     Label:
         text: root.text
         font_size: sp(23)
+
+<SelectableBoxThirdScreen>
+    Button:
+        text: root.text
+        font_size: sp(21)
+        on_release: 
+            root.on_expense_click()
+            app.root.current = "fifth" 
+            app.root.transition.direction = 'left'
+<SelectableBoxFifthScreen>
+    orientation: 'horizontal'
+    Label:
+        text: root.name
+        font_size: sp(20)
+        size_hint: 0.6, 1
+    Label:
+        size_hint: 0.1, 1
+        text: root.quantity
+        font_size: sp(20)
+        size_hint: 0.1, 1
+    Label:
+        text: root.price
+        font_size: sp(20)
+        size_hint: 0.2, 1
 
 <FirstScreen>:
     name: "first"
@@ -346,7 +371,7 @@
                 app.root.current = 'fourth'
         ListWidget:
             id: expensescontent
-            viewclass: 'SelectableBoxSecondScreen'
+            viewclass: 'SelectableBoxThirdScreen'
             orientation: 'vertical'
 
             RecycleBoxLayout:
@@ -398,7 +423,69 @@
                 app.root.current = "third" 
                 app.root.transition.direction = 'left'      
                 root.analyze_photo()  
-                     
+
+<FifthScreen>:
+    name: "fifth"
+    receiptitems:receiptitems
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            size_hint: 1, 0.1
+            Button:
+                size_hint: 0.2, 1
+                text: 'Back'
+                background_color: (1, 0, 0, 1)
+                on_release:
+                    app.root.current = 'third'
+                    app.root.transition.direction = 'right'    
+            Label: 
+                size_hint: 0.8, 1
+                text: 'Receipt details'
+                font_size: sp(28)
+            Label:
+                size_hint: 0.2, 1
+
+        
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: 1, 0.1
+            Label:
+                size_hint: 0.5, 1
+                text: root.company_name
+                font_size: sp(21)
+            Label:
+                size_hint: 0.5, 1
+                text: root.date_of_purchase
+                font_size: sp(21)
+        Label:
+            size_hint: 1, 0.1
+            text: root.total_amount
+            font_size: sp(21)
+        BoxLayout:
+            size_hint_y: 0.1
+            Label:
+                text: 'Name'
+                font_size: sp(21)
+                size_hint: 0.6, 1
+            Label:
+                text: 'Qt'
+                font_size: sp(21)
+                size_hint: 0.1, 1
+            Label:
+                text: 'Price/#'
+                font_size: sp(21)
+                size_hint: 0.2, 1
+        ListWidget3C:
+            id: receiptitems
+            viewclass: 'SelectableBoxFifthScreen'
+            orientation: 'vertical'
+
+            RecycleBoxLayout:
+                default_size: None, dp(56)
+                default_size_hint: 1, None
+                size_hint_y: None
+                height: self.minimum_height
+                orientation: 'vertical'
 
         
 

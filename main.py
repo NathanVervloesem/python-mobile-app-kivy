@@ -123,9 +123,39 @@ class SelectableBox(RecycleDataViewBehavior, BoxLayout):
         add_to_local_cart(myapp,text)
 
 
-
 class SelectableBoxSecondScreen(RecycleDataViewBehavior, BoxLayout):
+    pass
+
+class SelectableBoxThirdScreen(RecycleDataViewBehavior, BoxLayout):
     text = StringProperty("")
+    
+    def on_expense_click(self):
+        # Get id
+        split_str = self.text.rsplit('.')
+        id = split_str[0]
+        print(id)
+        
+        # Get item from expenses.json
+        with open(myapp.path_expenses,"r") as f:
+            expenses = json.load(f)
+        for item in expenses:
+            if str(item["id"]) == id:
+                render_item = item
+
+        # Render on the fifth page - #TODO 
+        myapp.fifth_screen.company_name = render_item["merchant_name"]
+        myapp.fifth_screen.date_of_purchase = render_item["date_of_purchase"]
+        myapp.fifth_screen.total_amount = str(render_item["total_amount"]) + ' euro'
+
+        myapp.fifth_screen.receiptitems.items = render_item["items_purchased"]
+        #print(render_item["items_purchased"])
+        myapp.fifth_screen.receiptitems.update()
+        
+
+class SelectableBoxFifthScreen(RecycleDataViewBehavior, BoxLayout):
+    name = StringProperty("")
+    quantity = StringProperty("")
+    price = StringProperty("")
 
 class Tabs(TabbedPanel):
     def __init__(self, **kwargs):
@@ -151,6 +181,13 @@ class ListWidget(RecycleView):
         self.items = []
         self.label = ''
 
+class ListWidget3C(RecycleView):
+    def update(self):
+        self.data = [{'name': str(item['item']) , 'quantity': str(item['quantity']), 'price': str(item['price'])}for item in self.items]
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.items = []
 class FirstScreen(Screen):
     inputbutton1 = ObjectProperty(None)
     inputcontent1 = ObjectProperty(None)
@@ -319,22 +356,43 @@ class FourthScreen(Screen):
             self.img.source = new_path
             self.img.reload()
 
-    def analyze_photo(self):  # TODO  
+    def analyze_photo(self):  
         # Here the code with the LLM
         analysis_result = analyze_receipt_image(self.img.source)
 
         # Organise in data
         data = get_receipt_data(analysis_result)
 
-        # Render on expenses screen
-        data_string = convert_expenses_data(data)
-
+        # Generate new id
         exp = myapp.third_screen.expensescontent
+        with open(myapp.path_expenses,"r") as f:
+            expenses = json.load(f) 
+   
+        if len(expenses) > 0:
+            last_item = expenses[-1]
+            new_id = last_item["id"] + 1
+        else:
+            new_id = 1
+        
+        data["id"] = new_id
+ 
+        # Render on expenses screen
+        data_string = convert_expenses_data(data)        
         exp.items.append(data_string)
         exp.update()
 
         # Save in local expenses file
         save_receipt_data(myapp, data)
+
+
+class FifthScreen(Screen):
+    company_name = StringProperty("")
+    date_of_purchase = StringProperty("")
+    total_amount = StringProperty("")
+    receiptitems = ObjectProperty(None)
+
+    def on_kv_post(self, base_widget):
+        myapp.fifth_screen = self
 
 class MyshoppingApp(App):
     def __init__(self):
