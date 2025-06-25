@@ -81,3 +81,7 @@ def increase_amount(text):
 
 def convert_expenses_data(data):
     return f'{data["id"]}. {data["merchant_name"]} {data["date_of_purchase"]} {data["total_amount"]}euro'
+
+def get_expense_id(text):
+    split_str = text.rsplit('.')
+    return split_str[0]

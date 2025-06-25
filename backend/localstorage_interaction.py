@@ -1,5 +1,5 @@
 import json
-from utils.data_utils import convert_expenses_data
+from utils.data_utils import convert_expenses_data, get_expense_id
 
 
 def load_local(myapp):
@@ -89,7 +89,7 @@ def clear_local_cart(myapp):
         print('Clear cart')   
 
 
-def save_receipt_data(myapp, data):
+def add_receipt_data(myapp, data):
     with open(myapp.path_expenses,"r") as f:
         expenses = json.load(f)
         id = len(expenses) + 1
@@ -114,3 +114,25 @@ def load_local_expenses(myapp):
         itemlist.items.append(convert_expenses_data(item))
     
     itemlist.update()
+ 
+ 
+def remove_item_local_expenses(myapp, text):
+    '''
+    Remove expenses from local file
+    '''
+    
+    with open(myapp.path_expenses,"r") as f:
+        expenses = json.load(f)
+
+    id = get_expense_id(text)
+    for expense in expenses: 
+        if str(expense["id"]) == id:
+            print('Found expense to remove')
+            expenses.remove(expense)
+            break
+
+    with open(myapp.path_expenses, "w") as f:
+        json.dump(expenses, f, indent=2)
+        print('Saved expenses to local file')
+    
+

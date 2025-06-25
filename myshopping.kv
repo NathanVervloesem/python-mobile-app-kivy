@@ -41,12 +41,21 @@
 
 <SelectableBoxThirdScreen>
     Button:
+        size_hint: 0.9, 1
         text: root.text
         font_size: sp(18)
         on_release: 
             root.on_expense_click()
             app.root.current = "fifth" 
             app.root.transition.direction = 'left'
+    Button:
+        size_hint: 0.1, 1
+        text: 'X'
+        font_size: sp(18)
+        background_color: (1, 0, 0, 1)
+        on_release:
+            root.on_remove_expense()
+        
 <SelectableBoxFifthScreen>
     orientation: 'horizontal'
     Label:

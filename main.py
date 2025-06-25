@@ -14,8 +14,8 @@ from plyer import filechooser
 
 # Function from other files
 from backend.backend_interaction import add_to_backend, clear_tab_backend, deploy_changes_wrapper, load_items, remove_item_in_backend, replace_item_in_backend
-from backend.localstorage_interaction import add_to_local_cart, load_local_cart, clear_local_cart, save_receipt_data, load_local_expenses
-from utils.data_utils import get_input, get_itemlist, increase_amount, convert_expenses_data
+from backend.localstorage_interaction import add_to_local_cart, load_local_cart, clear_local_cart, add_receipt_data, load_local_expenses, remove_item_local_expenses
+from utils.data_utils import get_input, get_itemlist, increase_amount, convert_expenses_data, get_expense_id
 from utils.ai_utils import analyze_receipt_image, get_receipt_data
 
 
@@ -131,9 +131,7 @@ class SelectableBoxThirdScreen(RecycleDataViewBehavior, BoxLayout):
     
     def on_expense_click(self):
         # Get id
-        split_str = self.text.rsplit('.')
-        id = split_str[0]
-        print(id)
+        id = get_expense_id(self.text)
         
         # Get item from expenses.json
         with open(myapp.path_expenses,"r") as f:
@@ -150,6 +148,20 @@ class SelectableBoxThirdScreen(RecycleDataViewBehavior, BoxLayout):
         myapp.fifth_screen.receiptitems.items = render_item["items_purchased"]
         #print(render_item["items_purchased"])
         myapp.fifth_screen.receiptitems.update()
+
+    def on_remove_expense(self):
+        '''
+        Remove an expense from the expense list
+        '''
+
+        exp = myapp.third_screen.expensescontent
+        exp.items.remove(self.text)
+        exp.update()
+
+        # Update expenses file
+        remove_item_local_expenses(myapp, self.text)
+
+
         
 
 class SelectableBoxFifthScreen(RecycleDataViewBehavior, BoxLayout):
@@ -383,7 +395,7 @@ class FourthScreen(Screen):
             exp.update()
 
             # Save in local expenses file
-            save_receipt_data(myapp, data)
+            add_receipt_data(myapp, data)
 
 
 class FifthScreen(Screen):
