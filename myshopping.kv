@@ -15,7 +15,7 @@
         size_hint: 0.20, 1
         text: '+'
         background_color: (0, 1, 0, 1)
-        on_press: root.on_multiple_button_click()
+        on_release: root.on_multiple_button_click()
         font_size: sp(32)
 
     Label:
@@ -25,13 +25,13 @@
         size_hint: 0.20, 1
         text: "x"
         background_color: (1, 0, 0, 1)
-        on_press: root.on_remove_button_click()
+        on_release: root.on_remove_button_click()
         font_size: sp(32)
     Button
         size_hint: 0.20, 1
         text: "cart"
         background_color: (0, 0, 1, 1)
-        on_press: root.on_cart_button_click()
+        on_release: root.on_cart_button_click()
         font_size: sp(23)
 
 <SelectableBoxSecondScreen>
@@ -42,7 +42,7 @@
 <SelectableBoxThirdScreen>
     Button:
         text: root.text
-        font_size: sp(21)
+        font_size: sp(18)
         on_release: 
             root.on_expense_click()
             app.root.current = "fifth" 
@@ -51,16 +51,17 @@
     orientation: 'horizontal'
     Label:
         text: root.name
-        font_size: sp(20)
+        font_size: sp(16)
         size_hint: 0.6, 1
+        text_size: self.width, None
     Label:
         size_hint: 0.1, 1
         text: root.quantity
-        font_size: sp(20)
+        font_size: sp(16)
         size_hint: 0.1, 1
     Label:
         text: root.price
-        font_size: sp(20)
+        font_size: sp(16)
         size_hint: 0.2, 1
 
 <FirstScreen>:
@@ -120,7 +121,7 @@
                             size_hint: 0.3, 1
                             text: 'add'
                             background_color: (0, 1, 0, 1)
-                            on_press: root.add_item()
+                            on_release: root.add_item()
                             font_size: sp(23)
 
                         TextInput:
@@ -132,7 +133,7 @@
                             size_hint: 0.8, 1
                             text: 'clear tab'
                             background_color: (1, 0, 0, 1)
-                            on_press: root.clear_tab()
+                            on_release: root.clear_tab()
                             font_size: sp(25)
                 
                     ListWidget:
@@ -165,7 +166,7 @@
                             size_hint: 0.3, 1
                             text: 'add'
                             background_color: (0, 1, 0, 1)
-                            on_press: root.add_item()
+                            on_release: root.add_item()
                             font_size: sp(23)
 
                         TextInput:
@@ -177,7 +178,7 @@
                             size_hint: 0.8, 1
                             text: 'clear tab'
                             background_color: (1, 0, 0, 1)
-                            on_press: root.clear_tab()
+                            on_release: root.clear_tab()
                             font_size: sp(25)
 
                     ListWidget:
@@ -211,7 +212,7 @@
                             size_hint: 0.3, 1
                             text: 'add'
                             background_color: (0, 1, 0, 1)
-                            on_press: root.add_item()
+                            on_release: root.add_item()
                             font_size: sp(23)
 
                         TextInput:
@@ -223,7 +224,7 @@
                             size_hint: 0.8, 1
                             text: 'clear tab'
                             background_color: (1, 0, 0, 1)
-                            on_press: root.clear_tab()
+                            on_release: root.clear_tab()
                             font_size: sp(25)
 
                     ListWidget:
@@ -257,7 +258,7 @@
                             size_hint: 0.3, 1
                             text: 'add'
                             background_color: (0, 1, 0, 1)
-                            on_press: root.add_item()
+                            on_release: root.add_item()
                             font_size: sp(23)
 
                         TextInput:
@@ -269,7 +270,7 @@
                             size_hint: 0.8, 1
                             text: 'clear tab'
                             background_color: (1, 0, 0, 1)
-                            on_press: root.clear_tab()
+                            on_release: root.clear_tab()
                             font_size: sp(25)
 
                     ListWidget:
@@ -293,14 +294,14 @@
                 size_hint: 0.5, 1
                 text: "Cart"   
                 font_size: sp(23)
-                on_press: 
+                on_release: 
                     app.root.current = "second"
                     app.root.transition.direction = 'left'
             Button:
                 size_hint: 0.5, 1
                 text: "Expenses"
                 font_size: sp(23)   
-                on_press:
+                on_release:
                     app.root.current = "third"
                     app.root.transition.direction = 'left'
 
@@ -319,7 +320,7 @@
             size_hint: 1, 0.1
             background_color: (1, 0, 0, 1)
             font_size: sp(23)
-            on_press: root.on_clear_cart_click()
+            on_release: root.on_clear_cart_click()
 
         ListWidget:
             id: outputcontent
@@ -338,7 +339,7 @@
                 size_hint: 0.5, 1
                 text: "Shopping"
                 font_size: sp(23)
-                on_press: 
+                on_release: 
                     app.root.current = "first" 
                     app.root.transition.direction = 'right'   
             Button:
@@ -349,7 +350,7 @@
                 size_hint: 0.5, 1
                 text: "Expenses"
                 font_size: sp(23)
-                on_press:
+                on_release:
                     app.root.current = "third"
                     app.root.transition.direction = 'left'
 
@@ -367,7 +368,7 @@
             font_size: sp(23)
             text: 'Add expense'
             background_color: (0, 1, 0, 1)
-            on_press:
+            on_release:
                 app.root.current = 'fourth'
         ListWidget:
             id: expensescontent
@@ -386,14 +387,14 @@
                 size_hint: 0.5, 1
                 text: "Shopping"
                 font_size: sp(23)                
-                on_press: 
+                on_release: 
                     app.root.current = "first" 
                     app.root.transition.direction = 'right'   
             Button:
                 size_hint: 0.5, 1
                 text: "Cart"
                 font_size: sp(23)
-                on_press: 
+                on_release: 
                     app.root.current = "second" 
                     app.root.transition.direction = 'right'                
             Button:
@@ -410,7 +411,7 @@
             text: 'Choose Image'
             size_hint_y: None
             height: '48sp'
-            font_size: sp(32)
+            font_size: sp(23)
             on_release: root.select_file()
         Image:
             id: img
@@ -418,7 +419,7 @@
         Button:
             text: 'Analyze and add'
             size_hint: 1, 0.1 
-            font_size: sp(32)
+            font_size: sp(23)
             on_release: 
                 app.root.current = "third" 
                 app.root.transition.direction = 'left'      
@@ -442,38 +443,38 @@
                 size_hint: 0.8, 1
                 text: 'Receipt details'
                 font_size: sp(28)
+              
             Label:
                 size_hint: 0.2, 1
-
-        
-        BoxLayout:
-            orientation: 'horizontal'
-            size_hint: 1, 0.1
-            Label:
-                size_hint: 0.5, 1
-                text: root.company_name
-                font_size: sp(21)
-            Label:
-                size_hint: 0.5, 1
-                text: root.date_of_purchase
-                font_size: sp(21)
+           
         Label:
             size_hint: 1, 0.1
-            text: root.total_amount
+            text: root.company_name
             font_size: sp(21)
+                
+        Label:
+            size_hint: 1, 0.1
+            text: root.date_of_purchase
+            font_size: sp(21)
+
+        Label:
+            size_hint: 1, 0.1
+            text: 'Bought items:'
+            font_size: sp(21)
+
         BoxLayout:
             size_hint_y: 0.1
             Label:
                 text: 'Name'
-                font_size: sp(21)
+                font_size: sp(18)
                 size_hint: 0.6, 1
             Label:
                 text: 'Qt'
-                font_size: sp(21)
+                font_size: sp(18)
                 size_hint: 0.1, 1
             Label:
                 text: 'Price/#'
-                font_size: sp(21)
+                font_size: sp(18)
                 size_hint: 0.2, 1
         ListWidget3C:
             id: receiptitems
@@ -486,6 +487,11 @@
                 size_hint_y: None
                 height: self.minimum_height
                 orientation: 'vertical'
+
+        Label:
+            size_hint: 1, 0.3
+            text: root.total_amount
+            font_size: sp(21)
 
         
 
