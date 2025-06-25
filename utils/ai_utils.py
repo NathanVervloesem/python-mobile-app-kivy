@@ -1,6 +1,6 @@
 import ast
 import google.generativeai as genai
-from PIL import Image
+from PIL import Image as PILImage
 
 
 def analyze_receipt_image(image_path):
@@ -18,7 +18,7 @@ def analyze_receipt_image(image_path):
         # Load the Gemini Pro Vision model
         model = genai.GenerativeModel('gemini-1.5-flash')
         # Load the image using PIL
-        img = Image.open(image_path)
+        img = PILImage.open(image_path)
 
         # Construct the prompt
         prompt = """

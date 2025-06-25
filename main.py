@@ -3,7 +3,7 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.properties import ObjectProperty, StringProperty
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.image import Image
+#from kivy.uix.image import Image
 from kivy.uix.recycleview import RecycleView
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
@@ -21,12 +21,11 @@ from utils.ai_utils import analyze_receipt_image, get_receipt_data
 
 # External imports
 from datetime import datetime
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 import google.generativeai as genai
 import json
 import os
 from pathlib import Path
-from PIL import Image
 import requests
 import shutil
 
@@ -42,8 +41,8 @@ DATA_FILE_EXPENSES = 'expenses.json'
 ORIGINAL_CWD = Path().absolute()
 
 # Load environment variables
-load_dotenv()
-GOOGLE_API_KEY = os.getenv("API_KEY")
+#load_dotenv()
+GOOGLE_API_KEY = 'AIzaSyB-lE7DY_eKwATeWjznVX_klfrhaKfscGw'
 
 if not GOOGLE_API_KEY:
     print("Error: Google API key not found.   Please set the GOOGLE_API_KEY environment variable.")
@@ -398,7 +397,9 @@ class FourthScreen(Screen):
             add_receipt_data(myapp, data)
 
             # Remove the image
-            os.remove(self.img.source)
+            path = self.img.source
+            if os.path.exists(path):
+                os.remove(path)
 
 
 class FifthScreen(Screen):
