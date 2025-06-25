@@ -143,9 +143,9 @@ class SelectableBoxThirdScreen(RecycleDataViewBehavior, BoxLayout):
                 render_item = item
 
         # Render on the fifth page - #TODO 
-        myapp.fifth_screen.company_name = render_item["merchant_name"]
-        myapp.fifth_screen.date_of_purchase = render_item["date_of_purchase"]
-        myapp.fifth_screen.total_amount = str(render_item["total_amount"]) + ' euro'
+        myapp.fifth_screen.company_name = 'Store: ' + render_item["merchant_name"]
+        myapp.fifth_screen.date_of_purchase = 'Date: ' + render_item["date_of_purchase"]
+        myapp.fifth_screen.total_amount = 'Total amount:  ' +str(render_item["total_amount"]) + ' euro'
 
         myapp.fifth_screen.receiptitems.items = render_item["items_purchased"]
         #print(render_item["items_purchased"])
@@ -183,7 +183,7 @@ class ListWidget(RecycleView):
 
 class ListWidget3C(RecycleView):
     def update(self):
-        self.data = [{'name': str(item['item']) , 'quantity': str(item['quantity']), 'price': str(item['price'])}for item in self.items]
+        self.data = [{'name': '  '+str(item['item']) , 'quantity': str(item['quantity']), 'price': str(item['price'])}for item in self.items]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -358,31 +358,32 @@ class FourthScreen(Screen):
 
     def analyze_photo(self):  
         # Here the code with the LLM
-        analysis_result = analyze_receipt_image(self.img.source)
+        if self.img.source:
+            analysis_result = analyze_receipt_image(self.img.source)
 
-        # Organise in data
-        data = get_receipt_data(analysis_result)
+            # Organise in data
+            data = get_receipt_data(analysis_result)
 
-        # Generate new id
-        exp = myapp.third_screen.expensescontent
-        with open(myapp.path_expenses,"r") as f:
-            expenses = json.load(f) 
-   
-        if len(expenses) > 0:
-            last_item = expenses[-1]
-            new_id = last_item["id"] + 1
-        else:
-            new_id = 1
-        
-        data["id"] = new_id
- 
-        # Render on expenses screen
-        data_string = convert_expenses_data(data)        
-        exp.items.append(data_string)
-        exp.update()
+            # Generate new id
+            exp = myapp.third_screen.expensescontent
+            with open(myapp.path_expenses,"r") as f:
+                expenses = json.load(f) 
+    
+            if len(expenses) > 0:
+                last_item = expenses[-1]
+                new_id = last_item["id"] + 1
+            else:
+                new_id = 1
+            
+            data["id"] = new_id
+    
+            # Render on expenses screen
+            data_string = convert_expenses_data(data)        
+            exp.items.append(data_string)
+            exp.update()
 
-        # Save in local expenses file
-        save_receipt_data(myapp, data)
+            # Save in local expenses file
+            save_receipt_data(myapp, data)
 
 
 class FifthScreen(Screen):
