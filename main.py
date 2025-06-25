@@ -397,6 +397,9 @@ class FourthScreen(Screen):
             # Save in local expenses file
             add_receipt_data(myapp, data)
 
+            # Remove the image
+            os.remove(self.img.source)
+
 
 class FifthScreen(Screen):
     company_name = StringProperty("")
