@@ -4,6 +4,7 @@
     ThirdScreen:
     FourthScreen:
     FifthScreen:
+    SixthScreen:
 
 
 <SelectableBox>:
@@ -368,10 +369,21 @@
     expensescontent:expensescontent
     BoxLayout:
         orientation: 'vertical'
-        Label: 
-            text: 'Expenses Screen'
+        BoxLayout:
             size_hint: 1, 0.1
-            font_size: sp(32) 
+            orientation: 'horizontal'
+            Label: 
+                text: 'Expenses Screen'
+                size_hint: 0.8, 1
+                font_size: sp(28) 
+            Button:
+                text: 'Overview'
+                background_color: (0,0,1,1)
+                size_hint: 0.2, 1
+                font_size: sp(18)
+                on_release: 
+                    app.root.current = "sixth" 
+                    app.root.transition.direction = 'left' 
         Button:
             size_hint: 1, 0.1
             font_size: sp(23)
@@ -503,6 +515,15 @@
             font_size: sp(21)
 
         
+<SixthScreen>:
+    name: 'sixth'
+
+    Button:
+        text: 'back'
+        background_color:(1,0, 0,1)
+        on_release: 
+            app.root.current = "third" 
+            app.root.transition.direction = 'right'
 
 
 

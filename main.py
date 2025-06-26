@@ -411,6 +411,11 @@ class FifthScreen(Screen):
     def on_kv_post(self, base_widget):
         myapp.fifth_screen = self
 
+class SixthScreen(Screen):
+    
+    def on_kv_post(self, base_widget):
+        myapp.sixth_screen = self
+
 class MyshoppingApp(App):
     def __init__(self):
         super().__init__()
