@@ -4,19 +4,19 @@
     "store": "Lidl"
   },
   {
-    "name": "bananan",
-    "store": "Lidl"
-  },
-  {
-    "name": "champignons",
-    "store": "Lidl"
-  },
-  {
     "name": "chips (3x)",
     "store": "Lidl"
   },
   {
-    "name": "griekse yoghurt2x",
+    "name": "bananen",
+    "store": "Lidl"
+  },
+  {
+    "name": "griekse yoghurt (2x)",
+    "store": "Lidl"
+  },
+  {
+    "name": "kippenkruiden",
     "store": "Lidl"
   },
   {
@@ -26,6 +26,10 @@
   {
     "name": "gember",
     "store": "Lidl"
+  },
+  {
+    "name": "snelkookrijst bonri",
+    "store": "Aldi"
   },
   {
     "name": "Kristalsuiker (2X)",
@@ -42,5 +46,9 @@
   {
     "name": "Muesli zak (2x)",
     "store": "Aldi"
+  },
+  {
+    "name": "half volle melk 3 pakken",
+    "store": "Carrefour"
   }
 ]
