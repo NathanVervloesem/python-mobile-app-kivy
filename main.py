@@ -22,7 +22,6 @@ from utils.ai_utils import analyze_receipt_image, get_receipt_data
 # External imports
 from datetime import datetime
 #from dotenv import load_dotenv
-import google.generativeai as genai
 import json
 import os
 from pathlib import Path
@@ -40,18 +39,6 @@ DATA_FILE_EXPENSES = 'expenses.json'
 
 ORIGINAL_CWD = Path().absolute()
 
-# Load environment variables
-#load_dotenv()
-GOOGLE_API_KEY = 'AIzaSyB-lE7DY_eKwATeWjznVX_klfrhaKfscGw'
-
-if not GOOGLE_API_KEY:
-    print("Error: Google API key not found.   Please set the GOOGLE_API_KEY environment variable.")
-    exit()
-
-genai.configure(api_key=GOOGLE_API_KEY)
-
-
-
 def get_item_file_path(filename):
     if platform == 'android':
         return os.path.join(App.get_running_app().user_data_dir, filename)
@@ -62,7 +49,6 @@ def check_file_existence(filename):
     if not os.path.exists(filename):
         with open(filename, "w") as f:
             json.dump([], f)
-
 
 
 class MyScreenManager(ScreenManager):

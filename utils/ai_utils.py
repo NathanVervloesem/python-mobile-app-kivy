@@ -1,6 +1,7 @@
 import ast
-import google.generativeai as genai
 from PIL import Image as PILImage
+import requests
+import base64
 
 
 def analyze_receipt_image(image_path):
@@ -15,10 +16,11 @@ def analyze_receipt_image(image_path):
              it returns an error message.
     """
     try:
-        # Load the Gemini Pro Vision model
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        # Load the image using PIL
-        img = PILImage.open(image_path)
+        GOOGLE_API_KEY = 'AIzaSyB-lE7DY_eKwATeWjznVX_klfrhaKfscGw'
+
+        if not GOOGLE_API_KEY:
+            print("Error: Google API key not found.   Please set the GOOGLE_API_KEY environment variable.")
+            exit()
 
         # Construct the prompt
         prompt = """
@@ -35,21 +37,34 @@ def analyze_receipt_image(image_path):
         """        
 
         # Generate content (analyze the image and respond to the prompt)
-        response = model.generate_content([prompt, img])
+        # Read and encode the image
+        with open(image_path, "rb") as img_file:
+            image_bytes = img_file.read()
+            image_b64 = base64.b64encode(image_bytes).decode("utf-8")
 
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GOOGLE_API_KEY}"
+        headers = {
+            "Content-Type": "application/json",
+        }
+        data = {
+            "contents": [{
+                "parts": [{"inlineData": 
+                           {"mimeType": "image/jpeg", "data": image_b64}},
+                          {"text": prompt}]
+            }]
+        }
+        response = requests.post(url, headers=headers, json=data)
         # Return the response text
-        return response.text     
-
+        return response.json()['candidates'][0]['content']['parts'][0]['text']
+    
     except FileNotFoundError:
         return f"Error: Image file not found at path: {image_path}"
     except Exception as e:
         return f"An error occurred during analysis: {e}"  
 
 def get_receipt_data(text):
-    splitted_text = text.rsplit('\n')
     try: 
-        data = ast.literal_eval(splitted_text[1])
+        return ast.literal_eval(text)
     except :
-        data = ast.literal_eval(splitted_text[0])
+        print('Error converting the response fo')
 
-    return data
