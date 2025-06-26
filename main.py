@@ -328,8 +328,17 @@ class FourthScreen(Screen):
         # Restore original working dir
         os.chdir(ORIGINAL_CWD)
 
+        print(f"File selection result: {selection}")
+        if not selection or not selection[0]:
+            print("No file selected or invalid selection.")
+            return
+
         if selection:
             original_path = selection[0]
+            if not os.path.exists(original_path):
+                print(f"Path does not exist: {original_path}")
+                return
+
             app = App.get_running_app()
 
             # Create a photos directory inside app's private storage

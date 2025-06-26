@@ -1,10 +1,34 @@
 [
   {
-    "name": "gember",
+    "name": "gember (6x)",
     "store": "Lidl"
   },
   {
-    "name": "griekse yohurt",
+    "name": "griekse yoghurt2x",
     "store": "Lidl"
+  },
+  {
+    "name": "Peren",
+    "store": "Lidl"
+  },
+  {
+    "name": "Chapignons in blik (2x)",
+    "store": "Lidl"
+  },
+  {
+    "name": "Kristalsuiker (2X)",
+    "store": "Aldi"
+  },
+  {
+    "name": "Lasagnebladen",
+    "store": "Aldi"
+  },
+  {
+    "name": "Augurk in zoetz.",
+    "store": "Aldi"
+  },
+  {
+    "name": "Muesli zak (2x)",
+    "store": "Aldi"
   }
 ]
