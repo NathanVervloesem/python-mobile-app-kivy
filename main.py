@@ -11,7 +11,6 @@ from kivy.uix.tabbedpanel import TabbedPanel
 from kivy.utils import platform
 from plyer import filechooser
 
-
 # Function from other files
 from backend.backend_interaction import add_to_backend, clear_tab_backend, deploy_changes_wrapper, load_items, remove_item_in_backend, replace_item_in_backend
 from backend.localstorage_interaction import add_to_local_cart, load_local_cart, clear_local_cart, add_receipt_data, load_local_expenses, remove_item_local_expenses
@@ -318,11 +317,80 @@ class FourthScreen(Screen):
 
 
     def select_file(self, *args):
-        filechooser.open_file(
-            title="Pick an Image",
-            filters=[("Image files", "*.jpg;*.jpeg;*.png")],
-            on_selection=self.file_selected
-        )
+        if platform == 'android':
+            self.file_picker_android()
+        else:
+            filechooser.open_file(
+                title="Pick an Image",
+                filters=[("Image files", "*.jpg;*.jpeg;*.png")],
+                on_selection=self.file_selected
+            )
+
+    def file_picker_android(self):
+        from android.permissions import request_permissions, Permission
+        from jnius import autoclass
+        from android import activity, mActivity
+
+        request_permissions([Permission.READ_EXTERNAL_STORAGE])
+        Intent = autoclass('android.content.Intent')
+        intent = Intent(Intent.ACTION_GET_CONTENT)
+        intent.setType("image/*")
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+
+        mActivity.startActivityForResult(intent, 1001)
+        activity.bind(on_activity_result=self.on_activity_result)  
+
+    def on_activity_result(self, request_code, result_code, intent):
+        if request_code != 1001 or result_code != -1:
+            return
+
+        from android import activity
+        from jnius import cast
+
+        uri = intent.getData()
+        if uri is None:
+            print("No URI returned.")
+            return
+
+        try:
+            # Read the input stream and save it to private storage
+            self.copy_image_from_uri(uri)
+        except Exception as e:
+            print(f"Error handling selected file: {e}")
+
+        activity.unbind(on_activity_result=self.on_activity_result)
+
+    def copy_image_from_uri(self, uri):
+        from android import mActivity
+        from jnius import autoclass, cast
+
+        ContentResolver = autoclass("android.content.ContentResolver")
+        InputStreamReader = autoclass("java.io.InputStreamReader")
+        BufferedInputStream = autoclass("java.io.BufferedInputStream")
+
+        resolver = mActivity.getContentResolver()
+        input_stream = resolver.openInputStream(uri)
+
+        # Create a filename and path
+        filename = f"photo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
+        app_dir = os.path.join(App.get_running_app().user_data_dir, "photos")
+        os.makedirs(app_dir, exist_ok=True)
+        file_path = os.path.join(app_dir, filename)
+
+        # Copy the file
+        with open(file_path, "wb") as out_file:
+            buf = bytearray(1024)
+            while True:
+                read_bytes = input_stream.read(buf)
+                if read_bytes == -1:
+                    break
+                out_file.write(buf[:read_bytes])
+
+        input_stream.close()
+
+        print(f"Saved file to: {file_path}")
+        self.img.source = file_path
+        self.img.reload()        
 
     def file_selected(self, selection):
         # Restore original working dir
@@ -395,6 +463,8 @@ class FourthScreen(Screen):
             path = self.img.source
             if os.path.exists(path):
                 os.remove(path)
+                self.img.source = ''
+                self.img.reload()
 
 
 class FifthScreen(Screen):
@@ -413,7 +483,7 @@ class MyshoppingApp(App):
         #self.url = 'http://127.0.0.1:8080/'  # For local testing
         self.screen_manager = ScreenManager()
 
-    def build(self):
+    def build(self):        
         # Initialize data files
         # Path for Android application
         self.path_items = get_item_file_path(DATA_FILE_ITEMS)
