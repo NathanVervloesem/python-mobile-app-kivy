@@ -1,5 +1,5 @@
 import json
-from utils.data_utils import convert_expenses_data, get_expense_id
+from utils.data_utils import convert_expenses_data, get_expense_id, get_month
 
 
 def load_local(myapp):
@@ -111,7 +111,7 @@ def load_local_expenses(myapp):
     # Convert
     itemlist = myapp.third_screen.expensescontent
     for item in data:
-        itemlist.items.append(convert_expenses_data(item))
+        itemlist.items.insert(0, convert_expenses_data(item))
     
     itemlist.update()
  
@@ -129,10 +129,94 @@ def remove_item_local_expenses(myapp, text):
         if str(expense["id"]) == id:
             print('Found expense to remove')
             expenses.remove(expense)
-            break
+
+    # Change id's
+    for idx, expense in enumerate(expenses):
+        if str(expense["id"]) > id:
+           expense["id"] -= 1 
+           expense_str = myapp.third_screen.expensescontent.items[idx]
+           expense_str_split = expense_str.rsplit('.')
+           myapp.third_screen.expensescontent.items[idx] = str(expense["id"]) + '.' +  expense_str_split[1]
+
+    myapp.third_screen.expensescontent.update()
 
     with open(myapp.path_expenses, "w") as f:
         json.dump(expenses, f, indent=2)
         print('Saved expenses to local file')
     
+def get_monthly_overview(myapp):
+    '''
+        Overview
+    '''
+    months = []
+    items = []
+    total_amount = []
+    with open(myapp.path_expenses,"r") as f:
+        expenses = json.load(f)
 
+    # Build the list of months
+    for expense in expenses:
+        if expense['date_of_purchase'] != 'not found':
+            month = get_month(expense)
+            if month not in(months):
+                month_split = month.rsplit('/')
+                month_num = month_split[0]
+                year_num = month_split[1]
+                l = len(months)
+                if l > 0:
+                    # Insert month in correct place
+                    for idx, mon in enumerate(months):
+                        # print(mon)
+                        mon_split = mon.rsplit('/')
+                        mon_num = mon_split[0]
+                        year_id = mon_split[1]
+                        if year_num < year_id and idx == (l-1):
+                            months.append(month) 
+                            break 
+                        elif year_num == year_id:
+                            if month_num > mon_num: # more recent so in front
+                                months.insert(idx, month)
+                                break
+                            elif month_num < mon_num: # less recent so behind
+                                months.insert(idx+1, month)
+                                break
+                        elif year_num > year_id: 
+                            months.insert(idx, month)
+                            break
+                else:
+                    months.append(month)
+
+                start_amount = 0
+                total_amount.append(start_amount)
+
+        # print(months)
+
+    # Get the total amount per months
+    if len(months) != len(total_amount):
+        print('List of months has not the same length as the list of total amount.')
+        # print(months)
+        # print(total_amount)
+        exit()
+
+    for idx, month in enumerate(months):
+        for expense in expenses:
+            mon = get_month(expense)
+            if month == mon:
+                total_amount[idx] += float(expense['total_amount'])
+
+    for idx, month in enumerate(months):
+        data = {
+            'month': month,
+            'total': total_amount[idx]
+        }
+        items.append(data)
+
+    #print(items)
+
+    return items
+
+
+
+
+    
+  

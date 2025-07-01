@@ -85,3 +85,12 @@ def convert_expenses_data(data):
 def get_expense_id(text):
     split_str = text.rsplit('.')
     return split_str[0]
+
+def get_month(expense):
+    text = expense["date_of_purchase"]
+    split_date = text.rsplit('/')
+    if len(split_date) == 3:
+        return split_date[1] + '/' + split_date[2]
+    else:
+        print('Date of purchase not in correct format')
+        return None

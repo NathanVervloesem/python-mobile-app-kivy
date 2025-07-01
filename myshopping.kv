@@ -80,6 +80,17 @@
         font_size: sp(16)
         size_hint: 0.2, 1
 
+<SelectableBoxSixthScreen>
+    orientation: 'horizontal'
+    Button:
+        text: root.month
+        font_size: sp(16)
+        size_hint: 0.5, 1
+    Label:
+        text: root.total
+        font_size: sp(16)
+        size_hint: 0.5, 1
+
 <FirstScreen>:
     name: "first"
     inputbutton1: inputbutton1
@@ -390,6 +401,7 @@
                 on_release: 
                     app.root.current = "sixth" 
                     app.root.transition.direction = 'left' 
+                    root.on_overview_click()
         Button:
             size_hint: 1, 0.1
             font_size: sp(23)
@@ -523,13 +535,48 @@
         
 <SixthScreen>:
     name: 'sixth'
+    monthly_expense:monthly_expense
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: 1, 0.1
+            Button:
+                size_hint: 0.2, 1
+                text: 'Back'
+                background_color:(1,0, 0,1)
+                on_release: 
+                    app.root.current = "third" 
+                    app.root.transition.direction = 'right'
+            Label:
+                text: 'Monthly Overview'
+                size_hint: 0.8, 1
+                font_size: sp(28)
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: 1, 0.1
+            Label:
+                text: 'Month'
+                size_hint: 0.5, 1
+                font_size: sp(23)
+            Label:
+                text: 'Total Expense'
+                size_hint: 0.5, 1
+                font_size: sp(23)
+        ListWidget2C:
+            id: monthly_expense
+            viewclass: 'SelectableBoxSixthScreen'
+            orientation: 'vertical'
 
-    Button:
-        text: 'back'
-        background_color:(1,0, 0,1)
-        on_release: 
-            app.root.current = "third" 
-            app.root.transition.direction = 'right'
+            RecycleBoxLayout:
+                default_size: None, sp(50)
+                default_size_hint: 1, None
+                size_hint_y: None
+                height: self.minimum_height
+                orientation: 'vertical'
+
+    
+        
 
 
 

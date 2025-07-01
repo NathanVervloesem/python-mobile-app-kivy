@@ -31,6 +31,7 @@ def analyze_receipt_image(image_path):
         - Date of Purchase . Present this information in format DD/MM/YYYY
         - Total Amount
         - Items Purchased (if possible, include quantity and price per item) Present this information in a list with the in format {"item": item_name, "quantity": quantity, "price": price}. If the quantity is not specified, assume the quantity is 1.
+        - Product Categories: the relevant product categories of the items purchased as found in 'Item Purchased', such as 'fruits', 'vegetable', 'dairy', 'snacks', 'drinks' etc. with the name of the category and the percentage of the total amount which is spend on the category and the items from 'Item Purchased' considered that category in the format {"name": category_name, "percentage": percentage, "items": [list of item names]}
 
         Present the information in a clear and organized format in an python object without any comments and without new lines (\n), so only the raw object. All the words should be lower case. If some information
         is not available in the image, indicate that it is "Not Found".

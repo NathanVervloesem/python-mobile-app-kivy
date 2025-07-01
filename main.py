@@ -13,7 +13,7 @@ from plyer import filechooser
 
 # Function from other files
 from backend.backend_interaction import add_to_backend, clear_tab_backend, deploy_changes_wrapper, load_items, remove_item_in_backend, replace_item_in_backend
-from backend.localstorage_interaction import add_to_local_cart, load_local_cart, clear_local_cart, add_receipt_data, load_local_expenses, remove_item_local_expenses
+from backend.localstorage_interaction import add_to_local_cart, load_local_cart, clear_local_cart, add_receipt_data, load_local_expenses, remove_item_local_expenses, get_monthly_overview
 from utils.data_utils import get_input, get_itemlist, increase_amount, convert_expenses_data, get_expense_id
 from utils.ai_utils import analyze_receipt_image, get_receipt_data
 from utils.image_utils import file_picker_android
@@ -146,13 +146,14 @@ class SelectableBoxThirdScreen(RecycleDataViewBehavior, BoxLayout):
         # Update expenses file
         remove_item_local_expenses(myapp, self.text)
 
-
-        
-
 class SelectableBoxFifthScreen(RecycleDataViewBehavior, BoxLayout):
     name = StringProperty("")
     quantity = StringProperty("")
     price = StringProperty("")
+
+class SelectableBoxSixthScreen(RecycleDataViewBehavior, BoxLayout):
+    month = StringProperty("")
+    total = StringProperty("")
 
 class Tabs(TabbedPanel):
     def __init__(self, **kwargs):
@@ -177,6 +178,13 @@ class ListWidget(RecycleView):
         super().__init__(**kwargs)
         self.items = []
         self.label = ''
+
+class ListWidget2C(RecycleView):
+    def update(self):
+        self.data = [{'month': '  ' + str(item['month']), 'total': str(item['total'])+'  euro'}for item in self.items]
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.items = []
 
 class ListWidget3C(RecycleView):
     def update(self):
@@ -312,6 +320,13 @@ class ThirdScreen(Screen):
         # Load expenses   # use insert to put the newest items in front
         load_local_expenses(myapp)
 
+    def on_overview_click(self):
+        exps = myapp.sixth_screen.monthly_expense
+        exps.items = get_monthly_overview(myapp)
+        exps.update()
+
+        #myapp.sixth_screen.monthly_expense.items
+
 class FourthScreen(Screen):
     def on_kv_post(self, base_widget):
         myapp.fourth_screen = self
@@ -388,7 +403,8 @@ class FourthScreen(Screen):
     
             # Render on expenses screen
             data_string = convert_expenses_data(data)        
-            exp.items.append(data_string)
+            #exp.items.append(data_string)
+            exp.items.insert(0, data_string)
             exp.update()
 
             # Save in local expenses file
@@ -412,6 +428,10 @@ class FifthScreen(Screen):
         myapp.fifth_screen = self
 
 class SixthScreen(Screen):
+    '''
+      Overview page 
+    '''
+    monthly_expense = ObjectProperty(None)
     
     def on_kv_post(self, base_widget):
         myapp.sixth_screen = self
