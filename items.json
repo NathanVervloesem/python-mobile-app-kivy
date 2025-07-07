@@ -1,54 +1,26 @@
 [
   {
-    "name": "champignons in blik(2x)",
+    "name": "5brikke slagroom",
     "store": "Lidl"
   },
   {
-    "name": "chips (3x)",
+    "name": "30 eieren",
     "store": "Lidl"
   },
   {
-    "name": "bananen",
+    "name": "goddesa blauw ovale pot",
     "store": "Lidl"
   },
   {
-    "name": "griekse yoghurt (2x)",
-    "store": "Lidl"
-  },
-  {
-    "name": "kippenkruiden",
-    "store": "Lidl"
-  },
-  {
-    "name": "Peren",
-    "store": "Lidl"
-  },
-  {
-    "name": "gember",
-    "store": "Lidl"
-  },
-  {
-    "name": "snelkookrijst bonri",
+    "name": "5 brikke slagroom",
     "store": "Aldi"
   },
   {
-    "name": "Kristalsuiker (2X)",
-    "store": "Aldi"
+    "name": "bakboter (3x)",
+    "store": "Carrefour"
   },
   {
-    "name": "Lasagnebladen",
-    "store": "Aldi"
-  },
-  {
-    "name": "Augurk in zoetz.",
-    "store": "Aldi"
-  },
-  {
-    "name": "Muesli zak (2x)",
-    "store": "Aldi"
-  },
-  {
-    "name": "half volle melk 3 pakken",
+    "name": "zuurkool",
     "store": "Carrefour"
   }
 ]

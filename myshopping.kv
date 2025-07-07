@@ -456,13 +456,45 @@
             id: img
             source: ''
         Button:
-            text: 'Analyze and add'
+            id: analyze_button
             size_hint: 1, 0.1 
-            font_size: sp(23)
-            on_release: 
-                app.root.current = "third" 
-                app.root.transition.direction = 'right'      
-                root.analyze_photo()  
+            on_release:       
+                root.start_analysis() 
+
+            RelativeLayout:
+                size: self.parent.size
+                
+                BoxLayout:
+                    orientation: 'horizontal'
+                    spacing: 20
+                    padding: 20
+                    size_hint: None, None
+                    size: self.minimum_size
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5} 
+
+                    Label:
+                        id: loading_label
+                        text: 'Analyze Receipt'
+                        font_size: sp(23)
+                        size_hint: None, None
+                        size: self.texture_size  # Shrink to text
+                        halign: 'center'
+                        valign: 'middle'
+                    
+                    
+                    RotatingImage:
+                        id: cog
+                        source: 'assets/cog.png'
+                        size_hint: None, None
+                        size: sp(35), sp(35)
+                        opacity: 0
+                        canvas.before:
+                            PushMatrix
+                            Rotate:
+                                angle: self.angle
+                                origin: self.center
+                        canvas.after:
+                            PopMatrix
 
 <FifthScreen>:
     name: "fifth"

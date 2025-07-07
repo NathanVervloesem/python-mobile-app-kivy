@@ -1,15 +1,18 @@
 # Kivy imports
 from kivy.app import App
-from kivy.clock import Clock
-from kivy.properties import ObjectProperty, StringProperty
+from kivy.animation import Animation
+from kivy.clock import Clock, mainthread
+from kivy.properties import ObjectProperty, StringProperty, NumericProperty
 from kivy.uix.boxlayout import BoxLayout
-#from kivy.uix.image import Image
+from kivy.uix.image import Image
 from kivy.uix.recycleview import RecycleView
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
 from kivy.uix.tabbedpanel import TabbedPanel
 from kivy.utils import platform
 from plyer import filechooser
+import threading
+import time
 
 # Function from other files
 from backend.backend_interaction import add_to_backend, clear_tab_backend, deploy_changes_wrapper, load_items, remove_item_in_backend, replace_item_in_backend
@@ -383,6 +386,7 @@ class FourthScreen(Screen):
     def analyze_photo(self):  
         # Here the code with the LLM
         if self.img.source:
+
             analysis_result = analyze_receipt_image(self.img.source)
 
             # Organise in data
@@ -417,6 +421,43 @@ class FourthScreen(Screen):
                 self.img.source = ''
                 self.img.reload()
 
+        # When the analysis is done
+        self.on_analysis_done()
+
+
+    def start_analysis(self):
+        # Show loading UI
+        self.ids.loading_label.text = 'Analyzing... Please wait.'
+        self.ids.loading_label.opacity = 1
+        self.ids.cog.opacity = 1
+        self.start_cog_animation()
+
+        # Run LLM analysis in background
+        threading.Thread(target=self.analyze_photo).start()  
+
+    def start_cog_animation(self):
+        # Create infinite rotation animation
+        self.ids.cog.angle = 0  # Reset rotation
+        anim = Animation(angle=360, duration=2)
+        anim += Animation(angle=0, duration=0)
+        anim.repeat = True
+        anim.start(self.ids.cog)
+
+    @mainthread
+    def on_analysis_done(self):
+        self.ids.loading_label.text = 'Analyze Receipt'
+        self.ids.cog.opacity = 0
+        self.manager.current = 'third'
+        self.manager.transition.direction = 'right'
+
+
+# 
+class RelativeLayout(BoxLayout):
+    pass
+
+# Rotating image class
+class RotatingImage(Image):
+    angle = NumericProperty(0)  
 
 class FifthScreen(Screen):
     company_name = StringProperty("")
