@@ -30,6 +30,7 @@ import os
 from pathlib import Path
 import requests
 import shutil
+import cv2
 
 # Define tab labels
 tab_labels = ['Lidl', 'Aldi', 'Carrefour', 'Moemoe']
@@ -196,6 +197,39 @@ class ListWidget3C(RecycleView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.items = []
+
+# Rotating image class
+class RotatingImage(Image):
+    angle = NumericProperty(0)
+
+class LoadingScreen(Screen):
+    def on_enter(self):
+        self.start_cog_animation()
+        threading.Thread(target=self.warm_up_server).start()
+
+    def start_cog_animation(self):
+        cog = self.ids.get('cog') if 'cog' in self.ids else None
+        if cog:
+            anim = Animation(angle=360, duration=2)
+            anim += Animation(angle=0, duration=0)
+            anim.repeat = True
+            anim.start(cog)
+
+    def warm_up_server(self):
+        try:
+            # Option 1: simple warmup ping
+            r = requests.get(myapp.url + "ping", timeout=45)
+            r.raise_for_status()
+        except Exception as e:
+            print(f"Warm-up failed: {e}")
+            time.sleep(2)  # Still allow a short delay before continuing
+
+        self.switch_to_home()
+
+    @mainthread
+    def switch_to_home(self):
+        self.manager.current = 'first'
+
 class FirstScreen(Screen):
     inputbutton1 = ObjectProperty(None)
     inputcontent1 = ObjectProperty(None)
@@ -294,7 +328,6 @@ class FirstScreen(Screen):
         # Send this to backend
         clear_tab_backend(myapp, myapp.curr_tab)   
 
-
 class SecondScreen(Screen):
     outputcontent = ObjectProperty(None)
 
@@ -365,29 +398,51 @@ class FourthScreen(Screen):
             # Create a photos directory inside app's private storage
             if platform == 'android':
                 save_dir = os.path.join(app.user_data_dir, "photos")
+                save_resize_dir = os.path.join(app.user_data_dir, "photos_resize")
             else:
                 save_dir = "photos"
+                save_resize_dir = "photos_resize"
 
             os.makedirs(save_dir, exist_ok=True)
+            os.makedirs(save_resize_dir, exist_ok=True)
 
             # Unique filename (timestamp-based)
             ext = os.path.splitext(original_path)[1]
             filename = f"photo_{datetime.now().strftime('%Y%m%d_%H%M%S')}{ext}"
             new_path = os.path.join(save_dir, filename)
 
+            # Path for resized version
+            new_path_resize = os.path.join(save_resize_dir, filename)
+
             # Copy file
             shutil.copy(original_path, new_path)
+            shutil.copy(original_path,new_path_resize)
 
             print(f"Copied image to: {new_path}")
 
-            self.img.source = new_path
+            # Resize
+            self.resize_image_opencv(original_path, new_path_resize)
+
+            # Display
+            self.img.source = new_path_resize
             self.img.reload()
+
+            self.img_large = new_path
+
+    def resize_image_opencv(self,input_path, output_path, max_size=(1024, 1024)):
+        img = cv2.imread(input_path)
+        h, w = img.shape[:2]
+
+        scale = min(max_size[0] / w, max_size[1] / h, 1.0)
+        new_size = (int(w * scale), int(h * scale))
+        resized = cv2.resize(img, new_size, interpolation=cv2.INTER_AREA)
+        cv2.imwrite(output_path, resized)
 
     def analyze_photo(self):  
         # Here the code with the LLM
-        if self.img.source:
+        if self.img_large:
 
-            analysis_result = analyze_receipt_image(self.img.source)
+            analysis_result = analyze_receipt_image(self.img_large)
 
             # Organise in data
             data = get_receipt_data(analysis_result)
@@ -414,7 +469,7 @@ class FourthScreen(Screen):
             # Save in local expenses file
             add_receipt_data(myapp, data)
 
-            # Remove the image
+            # Remove the image from the display
             path = self.img.source
             if os.path.exists(path):
                 os.remove(path)
@@ -427,6 +482,7 @@ class FourthScreen(Screen):
 
     def start_analysis(self):
         # Show loading UI
+        self.ids.analyze_button.disabled = True
         self.ids.loading_label.text = 'Analyzing... Please wait.'
         self.ids.loading_label.opacity = 1
         self.ids.cog.opacity = 1
@@ -446,18 +502,16 @@ class FourthScreen(Screen):
     @mainthread
     def on_analysis_done(self):
         self.ids.loading_label.text = 'Analyze Receipt'
+        self.ids.analyze_button.disabled = False
         self.ids.cog.opacity = 0
         self.manager.current = 'third'
         self.manager.transition.direction = 'right'
 
-
-# 
+# For layout inside a buttons
 class RelativeLayout(BoxLayout):
     pass
 
-# Rotating image class
-class RotatingImage(Image):
-    angle = NumericProperty(0)  
+  
 
 class FifthScreen(Screen):
     company_name = StringProperty("")
