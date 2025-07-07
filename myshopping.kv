@@ -1,4 +1,5 @@
 <MyScreenManager>
+    LoadingScreen:
     FirstScreen:
     SecondScreen:
     ThirdScreen:
@@ -90,6 +91,30 @@
         text: root.total
         font_size: sp(16)
         size_hint: 0.5, 1
+
+<LoadingScreen>:
+    name: 'loading'
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 20
+        padding: 40
+
+        Label:
+            text: 'Warming up...'
+            font_size: '24sp'
+
+        RotatingImage:
+            source: 'assets/cog.png'
+            size_hint: None, None
+            size: 64, 64
+            canvas.before:
+                PushMatrix
+                Rotate:
+                    angle: self.angle
+                    origin: self.center
+            canvas.after:
+                PopMatrix
+
 
 <FirstScreen>:
     name: "first"
@@ -455,6 +480,7 @@
         Image:
             id: img
             source: ''
+          
         Button:
             id: analyze_button
             size_hint: 1, 0.1 
