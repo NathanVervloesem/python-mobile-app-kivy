@@ -30,7 +30,6 @@ import os
 from pathlib import Path
 import requests
 import shutil
-import cv2
 
 # Define tab labels
 tab_labels = ['Lidl', 'Aldi', 'Carrefour', 'Moemoe']
@@ -149,6 +148,8 @@ class SelectableBoxThirdScreen(RecycleDataViewBehavior, BoxLayout):
 
         # Update expenses file
         remove_item_local_expenses(myapp, self.text)
+
+        myapp.third_screen.expensescontent.update()
 
 class SelectableBoxFifthScreen(RecycleDataViewBehavior, BoxLayout):
     name = StringProperty("")
@@ -366,6 +367,7 @@ class ThirdScreen(Screen):
 class FourthScreen(Screen):
     def on_kv_post(self, base_widget):
         myapp.fourth_screen = self
+        self.ids.analyze_button.disabled = True
 
 
     def select_file(self, *args):
@@ -420,8 +422,7 @@ class FourthScreen(Screen):
 
             print(f"Copied image to: {new_path}")
 
-            # Resize
-            self.resize_image_opencv(original_path, new_path_resize)
+            # Resize image if possible without disturbing other functionality: NOT FOUND
 
             # Display
             self.img.source = new_path_resize
@@ -429,18 +430,13 @@ class FourthScreen(Screen):
 
             self.img_large = new_path
 
-    def resize_image_opencv(self,input_path, output_path, max_size=(1024, 1024)):
-        img = cv2.imread(input_path)
-        h, w = img.shape[:2]
+            # Enable the analyze button     
+            self.ids.analyze_button.disabled = False
 
-        scale = min(max_size[0] / w, max_size[1] / h, 1.0)
-        new_size = (int(w * scale), int(h * scale))
-        resized = cv2.resize(img, new_size, interpolation=cv2.INTER_AREA)
-        cv2.imwrite(output_path, resized)
 
     def analyze_photo(self):  
         # Here the code with the LLM
-        if self.img_large:
+        if os.path.exists(self.img_large):
 
             analysis_result = analyze_receipt_image(self.img_large)
 
@@ -471,10 +467,14 @@ class FourthScreen(Screen):
 
             # Remove the image from the display
             path = self.img.source
+            path2 = self.img_large
             if os.path.exists(path):
                 os.remove(path)
                 self.img.source = ''
                 self.img.reload()
+
+            if os.path.exists(path2):
+                os.remove(path2)
 
         # When the analysis is done
         self.on_analysis_done()
@@ -486,7 +486,7 @@ class FourthScreen(Screen):
         self.ids.loading_label.text = 'Analyzing... Please wait.'
         self.ids.loading_label.opacity = 1
         self.ids.cog.opacity = 1
-        self.start_cog_animation()
+        #self.start_cog_animation()
 
         # Run LLM analysis in background
         threading.Thread(target=self.analyze_photo).start()  
@@ -501,7 +501,7 @@ class FourthScreen(Screen):
 
     @mainthread
     def on_analysis_done(self):
-        self.ids.loading_label.text = 'Analyze Receipt'
+        self.ids.loading_label.text = ''
         self.ids.analyze_button.disabled = False
         self.ids.cog.opacity = 0
         self.manager.current = 'third'

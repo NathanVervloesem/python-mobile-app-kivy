@@ -133,12 +133,13 @@ def remove_item_local_expenses(myapp, text):
     # Change id's
     for idx, expense in enumerate(expenses):
         if str(expense["id"]) > id:
+           #print(f'Reduce id, idx: {idx}')
+           #print(f'Length of expensescontent.items: {len(myapp.third_screen.expensescontent.items)}')
            expense["id"] -= 1 
            expense_str = myapp.third_screen.expensescontent.items[idx]
            expense_str_split = expense_str.rsplit('.')
            myapp.third_screen.expensescontent.items[idx] = str(expense["id"]) + '.' +  expense_str_split[1]
 
-    myapp.third_screen.expensescontent.update()
 
     with open(myapp.path_expenses, "w") as f:
         json.dump(expenses, f, indent=2)
